@@ -10,8 +10,11 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('Watple APIs')
     .setDescription('The Watple APIs description')
-    .setVersion('1.0.0')
-    .addTag('users')
+    .setVersion('1.0.1')
+    .addBearerAuth(
+      { type: 'http', scheme: 'bearer', bearerFormat: 'Token' }, //AuthGuard 설정
+      'access-token',
+    )
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document); //swagger setting
