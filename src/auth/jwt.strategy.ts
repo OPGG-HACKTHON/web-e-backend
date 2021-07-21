@@ -2,7 +2,6 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
 import { jwtConstants } from './constants';
-import { User } from 'src/users/interfaces/user.interface';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -14,11 +13,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: User) {
+  async validate(payload: any) {
+    //payload값 return
     return {
-      userId: payload.ID,
-      username: payload.name,
-      userpassword: payload.password,
+      userID: payload.username,
+      password: payload.sub,
     };
   }
 }

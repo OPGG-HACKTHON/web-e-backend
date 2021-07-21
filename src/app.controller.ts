@@ -25,9 +25,10 @@ export class AppController {
   @ApiOkResponse({
     description: '유저 로그인',
   })
-  @ApiUnauthorizedResponse({ description: '유효기간' })
+  @ApiUnauthorizedResponse({ description: '유효기간 만료' })
   @Post('auth/login')
-  @ApiBody({ type: LoginUserDto })
+  @ApiBody({ type: LoginUserDto }) //id와 비밀번호를 받는 형식
+  //Body로 전달해야 DTO데이터가 넘어간다!
   async login(@Body() loginData: LoginUserDto) {
     return this.authService.login(loginData);
   }
@@ -35,7 +36,7 @@ export class AppController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth() //Bearer 토큰이 필요
   @Get('profile')
-  getProfile(@Request() req) {
+  async getProfile(@Request() req) {
     return req.user;
   }
 }
