@@ -26,11 +26,12 @@ import { User } from './users/entities/user.entity';
         password: configService.get('database.password'),
         database: configService.get('database.name'),
         entities: [User],
-        synchronize: true,
+        synchronize: false,
       }),
     }),
     UsersModule,
     AuthModule,
+    TypeOrmModule.forFeature([User]), //users.module.ts에 있는걸 app.module.ts에도 동일하게 넣어준 모습
   ],
   controllers: [AppController, UsersController],
   providers: [],

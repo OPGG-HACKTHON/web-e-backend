@@ -14,11 +14,11 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(ID: string, password: string): Promise<User> {
-    const user = await this.authService.validateUser(ID, password);
-    if (!user) {
-      throw new UnauthorizedException(); //인증되지 않은경우, error handling
-    }
-    return user;
-  }
+  // async validate(ID: string, password: string): Promise<User> {
+  //   const user = await this.authService.validateUser(ID, password);
+  //   if (!user) {
+  //     throw new UnauthorizedException(); //인증되지 않은경우, error handling
+  //   }
+  //   return user;
+  // }
 }
