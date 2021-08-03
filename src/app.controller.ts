@@ -29,8 +29,8 @@ export class AppController {
   @Post('auth/login')
   @ApiBody({ type: LoginUserDto }) //id와 비밀번호를 받는 형식
   //Body로 전달해야 DTO데이터가 넘어간다!
-  async login(@Body() loginData: LoginUserDto) {
-    return this.authService.login(loginData);
+  async login(@Request() req) {
+    return this.authService.login(req.user);
   }
 
   @UseGuards(JwtAuthGuard)

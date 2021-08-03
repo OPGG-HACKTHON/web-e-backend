@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -25,7 +25,7 @@ export class UsersService {
 
     return await this.usersRepository.findOne(
       { userId: userId },
-      { select: ['userId', 'userPhoto', 'userEmail'] },
+      //{ select: ['userId', 'userPassword', 'userPhoto', 'userEmail'] }, << select option
     );
   }
 
@@ -51,11 +51,11 @@ export class UsersService {
       throw new HttpException('이미 존재하는 사용자입니다.', 401); //throw는 return 기능까지 수행한다.
     }
 
-    // const hashedPassword = await bcrypt.hash(userData.userPassword, 10);
+    const hashedPassword = await bcrypt.hash(userData.userPassword, 10);
     await this.usersRepository.save({
       //usersRepository.save가 DB에 저장시키는거
       userId: userData.userId,
-      userPassword: userData.userPassword,
+      userPassword: hashedPassword,
       userEmail: userData.userEmail,
     });
   }

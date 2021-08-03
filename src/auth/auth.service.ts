@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { User } from 'src/users/interfaces/user.interface';
 import { LoginUserDto } from 'src/users/dto/login-user.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -11,19 +11,31 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  // async validateUser(ID: string, password: string): Promise<User> {
-  //   const user = await this.usersService.findOne(ID);
-  //   if (user && user.password === password) {
-  //     // const { ...result, password } = user; //구조분해
-  //     return user;
-  //   }
-  //   return null;
-  // }
+  async validateUser(loginData: LoginUserDto): Promise<any> {
+    const user = await this.usersService.findOne(loginData.userId);
+    if (!user) {
+      throw new HttpException('유저 정보가 없습니다.', 401);
+    }
 
-  async login(loginData: LoginUserDto): Promise<any> {
+    const isMatch = await bcrypt.compare(
+      loginData.userPassword,
+      user.userPassword,
+    );
+    if (isMatch) {
+      const { userPassword, ...result } = user;
+      return result;
+    } else {
+      throw new HttpException('비밀번호가 일치하지 않습니다.', 400);
+    }
+  }
+
+  async login(user: any): Promise<any> {
     const payload = {
-      username: loginData.userId,
-      sub: loginData.userPassword,
+      userId: user.userId,
+      userEmail: user.userEmail,
+      userPhoto: user.userPhoto,
+      userIntro: user.userIntro,
+      isAdmin: user.isAdmin,
     };
     return {
       access_token: this.jwtService.sign(payload),
