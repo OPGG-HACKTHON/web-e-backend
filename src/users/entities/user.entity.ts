@@ -1,7 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsEmail, IsString } from 'class-validator';
+import { IsEmail, IsString } from 'class-validator';
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 // import { movie } from '../movie/movie.entity';
+
+export enum userRole {
+  ADMIN = 'admin',
+  USER = 'user',
+}
 
 @Entity('USER')
 export class User {
@@ -30,10 +35,10 @@ export class User {
   @Column({ nullable: true })
   userIntro: string;
 
-  @IsBoolean()
+  @IsString()
   @ApiProperty({ type: String, description: '관리자 여부' })
-  @Column({ default: false })
-  isAdmin: boolean;
+  @Column({ type: 'enum', enum: userRole, default: userRole.USER })
+  userRole: userRole;
 
   //   @OneToMany(() => Movie, (Movie) => Movie.user)
   //   movies: Movie[];

@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpStatus,
-  Param,
-  Post,
-  Res,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import {
   ApiResponse,
   ApiBody,
@@ -31,7 +23,7 @@ export class UsersController {
   @ApiBody({ type: CreateUserDto })
   async register(@Body() userData: CreateUserDto) {
     await this.userService.register(userData);
-    return { statusCode: 200 };
+    return { statusCode: 201 };
     //async await을 붙여줘야 service에서 내뿜은 에러를 받을 수 있다.
   }
 

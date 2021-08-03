@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
+import { bcryptConstant } from 'src/constants';
 
 @Injectable()
 export class UsersService {
@@ -51,7 +52,10 @@ export class UsersService {
       throw new HttpException('이미 존재하는 사용자입니다.', 401); //throw는 return 기능까지 수행한다.
     }
 
-    const hashedPassword = await bcrypt.hash(userData.userPassword, 10);
+    const hashedPassword = await bcrypt.hash(
+      userData.userPassword,
+      bcryptConstant.saltOrRounds,
+    );
     await this.usersRepository.save({
       //usersRepository.save가 DB에 저장시키는거
       userId: userData.userId,
