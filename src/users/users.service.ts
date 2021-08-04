@@ -5,6 +5,9 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import { bcryptConstant } from 'src/constants';
+import { LoginUserDto } from './dto/login-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class UsersService {
@@ -49,7 +52,7 @@ export class UsersService {
       userId: userData.userId,
     });
     if (user) {
-      throw new HttpException('이미 존재하는 사용자입니다.', 401); //throw는 return 기능까지 수행한다.
+      throw new HttpException('아이디 중복', 401); //throw는 return 기능까지 수행한다.
     }
 
     const hashedPassword = await bcrypt.hash(
@@ -62,5 +65,59 @@ export class UsersService {
       userPassword: hashedPassword,
       userEmail: userData.userEmail,
     });
+  }
+
+  async deleteUser(deleteData: LoginUserDto) {
+    if (!deleteData.userId) {
+      throw new HttpException('아이디 없음', 400);
+    }
+    if (!deleteData.userPassword) {
+      throw new HttpException('비밀번호 없음', 400);
+    }
+    const user = await this.usersRepository.findOne({
+      userId: deleteData.userId,
+    });
+
+    if (!user) {
+      throw new HttpException('해당 사용자 없음', 400); //throw는 return 기능까지 수행한다.
+    }
+
+    const isMatch = await bcrypt.compare(
+      deleteData.userPassword,
+      user.userPassword,
+    );
+    if (isMatch) {
+      return await this.usersRepository.delete({ userId: deleteData.userId });
+    } else {
+      throw new HttpException('비밀번호 불일치 (삭제불가)', 400);
+    }
+  }
+
+  async updateUser(id: string, updateData: UpdateUserDto) {
+    if (!id) {
+      throw new HttpException('아이디 없음', 400);
+    }
+
+    const user = await this.usersRepository.findOne({
+      userId: id,
+    });
+
+    if (!user) {
+      throw new HttpException('해당 사용자 없음', 400); //throw는 return 기능까지 수행한다.
+    } else {
+      const loginData = {
+        userId: user.userId,
+        userPassword: user.userPassword,
+      };
+      const loginDto = plainToClass(LoginUserDto, loginData);
+      console.log({ data: loginDto, dtd: updateData });
+      this.deleteUser(loginDto);
+      const hashedPassword = await bcrypt.hash(
+        updateData.userPassword,
+        bcryptConstant.saltOrRounds,
+      );
+      updateData.userPassword = hashedPassword;
+      this.usersRepository.save({ userId: id, ...updateData }); //오류는 왜 ?
+    }
   }
 }

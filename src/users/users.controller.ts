@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBody,
   ApiTags,
@@ -14,6 +23,8 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { userRole } from 'src/auth/role.decorator';
 import { RoleGuard } from 'src/auth/role.guard';
 import { CreateUserDto } from './dto/create-user.dto';
+import { LoginUserDto } from './dto/login-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { Role, User } from './entities/user.entity';
 import { UsersService } from './users.service';
 
@@ -50,12 +61,43 @@ export class UsersController {
   }
 
   @ApiBearerAuth('access-token') //Bearer 토큰이 필요, 이름으로 대체
+  @ApiOperation({
+    summary: '유저 삭제',
+    description: '아이디를 삭제한다.',
+  })
   @ApiUnauthorizedResponse({ description: '사용자 권한오류' })
-  @Get('/check/me')
+  @ApiBadRequestResponse({ description: '입력값 오류' })
+  @ApiOkResponse({ description: '삭제 완료' })
+  @Delete(':userId')
   @userRole(Role.USER) // USER Role을 가진 경우만 접근 가능
   @UseGuards(JwtAuthGuard, RoleGuard) // 두개의 Guard를 통과해야 api 접근
-  getMe() {
-    return 'Get Me!';
+  async deleteUser(@Body() deleteData: LoginUserDto) {
+    await this.userService.deleteUser(deleteData);
+    return { statusCode: 200, message: '삭제 완료' };
+  }
+
+  @ApiBearerAuth('access-token') //Bearer 토큰이 필요, 이름으로 대체
+  @ApiUnauthorizedResponse({ description: '사용자 권한오류' })
+  @ApiBadRequestResponse({ description: '입력값 오류' })
+  @ApiOkResponse({ description: '적용완료' })
+  @Patch('/:userId')
+  @userRole(Role.USER) // USER Role을 가진 경우만 접근 가능
+  @UseGuards(JwtAuthGuard, RoleGuard) // 두개의 Guard를 통과해야 api 접근
+  async updateUser(
+    @Param('userId') userId: string,
+    @Body() updateData: UpdateUserDto,
+  ) {
+    await this.userService.updateUser(userId, updateData);
+    return { statusCode: 200, message: '적용완료' };
+  }
+
+  @ApiBearerAuth('access-token') //Bearer 토큰이 필요, 이름으로 대체
+  @ApiUnauthorizedResponse({ description: '사용자 권한이 없습니다.' })
+  @Get('/check/user')
+  @userRole(Role.USER) // ADMIN Role을 가진 경우만 접근 가능
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  getUser() {
+    return `I'm User`;
   }
 
   @ApiBearerAuth('access-token') //Bearer 토큰이 필요, 이름으로 대체
