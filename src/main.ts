@@ -8,8 +8,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
-    .setTitle('Watple APIs')
-    .setDescription('The Watple APIs description')
+    .setTitle('WATPL APIs')
+    .setDescription('Watch Your Play! WATPL APIs description')
     .setVersion('1.0.1')
     .addBearerAuth(
       { type: 'http', scheme: 'bearer', bearerFormat: 'Token' }, //AuthGuard 설정
