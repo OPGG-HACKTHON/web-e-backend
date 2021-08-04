@@ -1,6 +1,6 @@
 import { Strategy } from 'passport-local';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, HttpStatus, Injectable } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginUserDto } from 'src/users/dto/login-user.dto';
 
@@ -21,7 +21,11 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     };
     const user = await this.authService.validateUser(loginData);
     if (!user) {
-      throw new UnauthorizedException(); //인증되지 않은경우, error handling
+      throw new ForbiddenException({
+        statusCode: HttpStatus.UNAUTHORIZED,
+        message: ['로그인 정보가 없습니다.'],
+        error: 'Forbidden',
+      }); //인증되지 않은경우, error handling
     }
     return user;
   }

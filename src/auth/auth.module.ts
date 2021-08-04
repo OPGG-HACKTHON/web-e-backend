@@ -6,6 +6,8 @@ import { UsersModule } from '../users/users.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from 'src/constants';
+import { APP_GUARD } from '@nestjs/core';
+import { RoleGuard } from './role.guard';
 
 @Module({
   imports: [
@@ -16,7 +18,15 @@ import { jwtConstants } from 'src/constants';
       signOptions: { expiresIn: '60s' }, //60초 이후 토큰만료
     }),
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [
+    AuthService,
+    LocalStrategy,
+    JwtStrategy,
+    {
+      provide: APP_GUARD,
+      useClass: RoleGuard,
+    },
+  ],
   exports: [AuthService],
 })
 export class AuthModule {}

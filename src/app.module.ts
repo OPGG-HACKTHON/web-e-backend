@@ -7,6 +7,8 @@ import configuration from './config/configuration';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { User } from './users/entities/user.entity';
+import { APP_GUARD } from '@nestjs/core';
+import { RoleGuard } from './auth/role.guard';
 
 @Module({
   imports: [

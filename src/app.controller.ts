@@ -26,7 +26,7 @@ export class AppController {
     return this.authService.login(req.user);
   }
 
-  @ApiBearerAuth() //Bearer 토큰이 필요
+  @ApiBearerAuth('access-token') //Bearer 토큰이 필요, 이름으로 대체
   @Get('profile')
   @UseGuards(JwtAuthGuard)
   async getProfile(@Request() req) {

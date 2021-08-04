@@ -1,12 +1,17 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import {
   ApiResponse,
   ApiBody,
   ApiTags,
   ApiOperation,
   ApiCreatedResponse,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { userRole } from 'src/auth/role.decorator';
+import { RoleGuard } from 'src/auth/role.guard';
 import { CreateUserDto } from './dto/create-user.dto';
+import { Role } from './entities/user.entity';
 import { UsersService } from './users.service';
 
 @ApiTags('사용자(User)')
@@ -36,5 +41,21 @@ export class UsersController {
   async findOne(@Param('userId') userId: string) {
     const data = await this.userService.findOne(userId);
     return { statusCode: 200, data };
+  }
+
+  @ApiBearerAuth('access-token') //Bearer 토큰이 필요, 이름으로 대체
+  @Get('/check/me')
+  @userRole(Role.USER)
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  getMe() {
+    return 'Get Me!';
+  }
+
+  @ApiBearerAuth('access-token') //Bearer 토큰이 필요, 이름으로 대체
+  @Get('/check/admin')
+  @userRole(Role.ADMIN)
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  getAdmin() {
+    return `U R Admin`;
   }
 }

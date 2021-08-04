@@ -3,9 +3,9 @@ import { IsEmail, IsString } from 'class-validator';
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 // import { movie } from '../movie/movie.entity';
 
-export enum userRole {
-  ADMIN = 'admin',
-  USER = 'user',
+export enum Role {
+  ADMIN = 'ADMIN',
+  USER = 'USER',
 }
 
 @Entity('USER')
@@ -37,8 +37,8 @@ export class User {
 
   @IsString()
   @ApiProperty({ type: String, description: '관리자 여부' })
-  @Column({ type: 'enum', enum: userRole, default: userRole.USER })
-  userRole: userRole;
+  @Column({ type: 'enum', enum: Role, default: Role.USER })
+  userRole: Role;
 
   //   @OneToMany(() => Movie, (Movie) => Movie.user)
   //   movies: Movie[];
