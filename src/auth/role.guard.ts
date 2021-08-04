@@ -16,15 +16,6 @@ export class RoleGuard extends JwtAuthGuard {
   }
 
   canActivate(context: ExecutionContext): boolean {
-    const passportActivate = super.canActivate(context);
-    console.log({ passes: passportActivate });
-    if (!passportActivate) {
-      throw new HttpException(
-        'You do not have permission (Roles)',
-        HttpStatus.UNAUTHORIZED,
-      );
-    }
-
     const requireRoles = this.reflector.getAllAndOverride<string[]>('role', [
       context.getHandler(),
       context.getClass(),
@@ -41,8 +32,7 @@ export class RoleGuard extends JwtAuthGuard {
     } else {
       throw new ForbiddenException({
         statusCode: HttpStatus.FORBIDDEN,
-        message: ['권한이 없습니다.'],
-        error: 'Forbidden',
+        message: '권한이 없습니다.',
       });
     }
   }

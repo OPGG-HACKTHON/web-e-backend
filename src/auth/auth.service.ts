@@ -38,6 +38,8 @@ export class AuthService {
       userRole: user.userRole,
     };
     return {
+      statusCode: 200,
+      message: '토큰 발행 성공',
       access_token: this.jwtService.sign(payload),
     };
   }

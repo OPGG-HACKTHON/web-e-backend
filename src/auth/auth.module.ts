@@ -18,15 +18,7 @@ import { RoleGuard } from './role.guard';
       signOptions: { expiresIn: '60s' }, //60초 이후 토큰만료
     }),
   ],
-  providers: [
-    AuthService,
-    LocalStrategy,
-    JwtStrategy,
-    {
-      provide: APP_GUARD,
-      useClass: RoleGuard,
-    },
-  ],
+  providers: [AuthService, LocalStrategy, JwtStrategy, RoleGuard],
   exports: [AuthService],
 })
 export class AuthModule {}
