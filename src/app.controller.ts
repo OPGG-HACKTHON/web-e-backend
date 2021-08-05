@@ -6,6 +6,7 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiOkResponse,
+  ApiOperation,
   ApiResponse,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -16,6 +17,10 @@ export class AppController {
   constructor(private authService: AuthService) {}
 
   @UseGuards(LocalAuthGuard)
+  @ApiOperation({
+    summary: '사용자 로그인',
+    description: '로그인을 진행한다',
+  })
   @ApiOkResponse({
     description: '유저 로그인',
   })
@@ -30,6 +35,10 @@ export class AppController {
   }
 
   @ApiBearerAuth('access-token') //Bearer 토큰이 필요, 이름으로 대체
+  @ApiOperation({
+    summary: 'jwt payload 확인',
+    description: 'jwt에 담긴 payload값을 확인한다',
+  })
   @Get('profile')
   @UseGuards(JwtAuthGuard)
   async getProfile(@Request() req) {

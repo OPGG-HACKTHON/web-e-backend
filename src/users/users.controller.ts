@@ -77,6 +77,10 @@ export class UsersController {
   }
 
   @ApiBearerAuth('access-token') //Bearer 토큰이 필요, 이름으로 대체
+  @ApiOperation({
+    summary: '유저 정보 업데이트',
+    description: '가능한 유저 정보를 갱신한다.',
+  })
   @ApiUnauthorizedResponse({ description: '사용자 권한오류' })
   @ApiBadRequestResponse({ description: '입력값 오류' })
   @ApiOkResponse({ description: '적용완료' })
@@ -92,20 +96,28 @@ export class UsersController {
   }
 
   @ApiBearerAuth('access-token') //Bearer 토큰이 필요, 이름으로 대체
+  @ApiOperation({
+    summary: '사용자 확인',
+    description: '유저 권한인지 확인한다',
+  })
   @ApiUnauthorizedResponse({ description: '사용자 권한이 없습니다.' })
   @Get('/check/user')
   @userRole(Role.USER) // USER Role을 가진 경우만 접근 가능
   @UseGuards(JwtAuthGuard, RoleGuard)
   getUser() {
-    return `I'm User`;
+    return `You are User`;
   }
 
   @ApiBearerAuth('access-token') //Bearer 토큰이 필요, 이름으로 대체
+  @ApiOperation({
+    summary: '사용자 확인',
+    description: '관리자 권한인지 확인한다',
+  })
   @ApiUnauthorizedResponse({ description: '사용자 권한이 없습니다.' })
   @Get('/check/admin')
   @userRole(Role.ADMIN) // ADMIN Role을 가진 경우만 접근 가능
   @UseGuards(JwtAuthGuard, RoleGuard)
   getAdmin() {
-    return `U R Admin`;
+    return `You are Admin`;
   }
 }
