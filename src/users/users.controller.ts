@@ -80,7 +80,7 @@ export class UsersController {
   @ApiUnauthorizedResponse({ description: '사용자 권한오류' })
   @ApiBadRequestResponse({ description: '입력값 오류' })
   @ApiOkResponse({ description: '적용완료' })
-  @Patch('/:userId')
+  @Patch(':userId')
   @userRole(Role.USER) // USER Role을 가진 경우만 접근 가능
   @UseGuards(JwtAuthGuard, RoleGuard) // 두개의 Guard를 통과해야 api 접근
   async updateUser(
@@ -94,7 +94,7 @@ export class UsersController {
   @ApiBearerAuth('access-token') //Bearer 토큰이 필요, 이름으로 대체
   @ApiUnauthorizedResponse({ description: '사용자 권한이 없습니다.' })
   @Get('/check/user')
-  @userRole(Role.USER) // ADMIN Role을 가진 경우만 접근 가능
+  @userRole(Role.USER) // USER Role을 가진 경우만 접근 가능
   @UseGuards(JwtAuthGuard, RoleGuard)
   getUser() {
     return `I'm User`;

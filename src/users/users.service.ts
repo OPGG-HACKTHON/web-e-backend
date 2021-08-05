@@ -7,7 +7,6 @@ import * as bcrypt from 'bcrypt';
 import { bcryptConstant } from 'src/constants';
 import { LoginUserDto } from './dto/login-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class UsersService {
@@ -32,7 +31,33 @@ export class UsersService {
       //{ select: ['userId', 'userPassword', 'userPhoto', 'userEmail'] }, << select option
     );
   }
+  // login정보 확인 logic
+  async checkLoginData(loginData: LoginUserDto): Promise<boolean> {
+    if (!loginData.userId) {
+      throw new HttpException('아이디 없음', 400);
+    }
+    if (!loginData.userPassword) {
+      throw new HttpException('비밀번호 없음', 400);
+    }
+    const user = await this.usersRepository.findOne({
+      userId: loginData.userId,
+    });
 
+    if (!user) {
+      throw new HttpException('해당 사용자 없음', 400); //throw는 return 기능까지 수행한다.
+    }
+
+    const isMatch = await bcrypt.compare(
+      loginData.userPassword,
+      user.userPassword,
+    );
+    if (isMatch) {
+      return true;
+    } else {
+      throw new HttpException('비밀번호 불일치 (삭제불가)', 400);
+    }
+  }
+  // 회원가입 logic
   async register(userData: CreateUserDto) {
     if (!userData.userId) {
       throw new HttpException('아이디가 없습니다.', 400);
@@ -66,58 +91,37 @@ export class UsersService {
       userEmail: userData.userEmail,
     });
   }
-
+  // 회원 삭제 logic
   async deleteUser(deleteData: LoginUserDto) {
-    if (!deleteData.userId) {
-      throw new HttpException('아이디 없음', 400);
-    }
-    if (!deleteData.userPassword) {
-      throw new HttpException('비밀번호 없음', 400);
-    }
-    const user = await this.usersRepository.findOne({
-      userId: deleteData.userId,
-    });
-
-    if (!user) {
-      throw new HttpException('해당 사용자 없음', 400); //throw는 return 기능까지 수행한다.
-    }
-
-    const isMatch = await bcrypt.compare(
-      deleteData.userPassword,
-      user.userPassword,
-    );
+    const isMatch = this.checkLoginData(deleteData);
     if (isMatch) {
       return await this.usersRepository.delete({ userId: deleteData.userId });
     } else {
       throw new HttpException('비밀번호 불일치 (삭제불가)', 400);
     }
   }
-
-  async updateUser(id: string, updateData: UpdateUserDto) {
-    if (!id) {
+  // 회원 정보 갱신 logic
+  async updateUser(userId: string, updateData: UpdateUserDto) {
+    if (!userId) {
       throw new HttpException('아이디 없음', 400);
     }
 
     const user = await this.usersRepository.findOne({
-      userId: id,
+      userId: userId,
     });
 
     if (!user) {
       throw new HttpException('해당 사용자 없음', 400); //throw는 return 기능까지 수행한다.
     } else {
-      const loginData = {
-        userId: user.userId,
-        userPassword: user.userPassword,
-      };
-      const loginDto = plainToClass(LoginUserDto, loginData);
-      console.log({ data: loginDto, dtd: updateData });
-      this.deleteUser(loginDto);
-      const hashedPassword = await bcrypt.hash(
-        updateData.userPassword,
-        bcryptConstant.saltOrRounds,
-      );
-      updateData.userPassword = hashedPassword;
-      this.usersRepository.save({ userId: id, ...updateData }); //오류는 왜 ?
+      if (!updateData.userPassword) updateData.userPassword = user.userPassword;
+      else {
+        const hashedPassword = await bcrypt.hash(
+          updateData.userPassword,
+          bcryptConstant.saltOrRounds,
+        );
+        updateData.userPassword = hashedPassword;
+      }
+      this.usersRepository.update(userId, updateData);
     }
   }
 }

@@ -39,7 +39,7 @@ export class AuthService {
     };
     return {
       statusCode: 201,
-      message: '토큰 발행 성공',
+      message: '로그인 성공, 토큰 발행',
       access_token: this.jwtService.sign(payload),
     };
   }
