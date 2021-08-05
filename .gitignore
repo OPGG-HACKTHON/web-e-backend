@@ -33,8 +33,5 @@ lerna-debug.log*
 !.vscode/launch.json
 !.vscode/extensions.json
 
-#auth secrets
-/src/constants.ts
-
 #env file
 .env

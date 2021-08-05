@@ -7,4 +7,11 @@ export default () => ({
     password: process.env.DATABASE_PASSWORD || '',
     port: process.env.DATABASE_PORT || '',
   },
+  jwtConstants: {
+    secret: process.env.JWT_SECRET_KEY || '',
+  },
+  bcryptConstant: {
+    saltOrRounds: Number(process.env.BCRYPT_CONSTANT_VALUE),
+  },
+  expirationTime: process.env.JWT_EXPIRATION_TIME,
 });

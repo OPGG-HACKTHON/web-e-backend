@@ -4,9 +4,9 @@ import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
-import { bcryptConstant } from 'src/constants';
 import { LoginUserDto } from './dto/login-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UsersService {
@@ -16,6 +16,7 @@ export class UsersService {
     //Test 할 때 Repository만 바꿔주면 testDB에 쿼리를 날릴 수 있어서 편리하다.
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    private configservice: ConfigService,
   ) {}
 
   async findOne(userId: string) {
@@ -82,7 +83,7 @@ export class UsersService {
 
     const hashedPassword = await bcrypt.hash(
       userData.userPassword,
-      bcryptConstant.saltOrRounds,
+      this.configservice.get('bcryptConstant.saltOrRounds'),
     );
     await this.usersRepository.save({
       //usersRepository.save가 DB에 저장시키는거
@@ -93,7 +94,7 @@ export class UsersService {
   }
   // 회원 삭제 logic
   async deleteUser(deleteData: LoginUserDto) {
-    const isMatch = this.checkLoginData(deleteData);
+    const isMatch = await this.checkLoginData(deleteData);
     if (isMatch) {
       return await this.usersRepository.delete({ userId: deleteData.userId });
     } else {
@@ -117,7 +118,7 @@ export class UsersService {
       else {
         const hashedPassword = await bcrypt.hash(
           updateData.userPassword,
-          bcryptConstant.saltOrRounds,
+          this.configservice.get('bcryptConstant.saltOrRounds'),
         );
         updateData.userPassword = hashedPassword;
       }
