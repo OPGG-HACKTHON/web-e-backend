@@ -35,3 +35,6 @@ lerna-debug.log*
 
 #auth secrets
 /src/auth/constants.ts
+
+#env file
+.env
