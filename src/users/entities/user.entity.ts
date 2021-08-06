@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsEmail, IsString } from 'class-validator';
+import { IsBoolean, IsEmail, IsOptional, IsString } from 'class-validator';
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
+import { Video } from 'src/videos/entities/video.entity';
 // import { movie } from '../movie/movie.entity';
 
 @Entity('USER')
@@ -34,6 +35,10 @@ export class User {
   @ApiProperty({ type: String, description: '관리자 여부' })
   @Column({ default: false })
   isAdmin: boolean;
+
+  @ApiProperty({ type: Video, description: '사용자 동영상' })
+  @OneToMany((type) => Video, (video) => video.user)
+  videos: Video[];
 
   //   @OneToMany(() => Movie, (Movie) => Movie.user)
   //   movies: Movie[];

@@ -4,8 +4,10 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
 } from 'typeorm';
 import { IsDate, IsEnum, IsNumber, IsString } from 'class-validator';
+import { User } from 'src/users/entities/user.entity';
 
 enum Game {
   League_of_Legends,
@@ -19,9 +21,8 @@ export class Video {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @IsString()
-  @Column('varchar')
-  userId: string;
+  @ManyToOne((type) => User, (user) => user.videos)
+  user: User;
 
   @IsDate()
   @CreateDateColumn()

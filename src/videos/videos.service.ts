@@ -5,9 +5,14 @@ import { Video } from './entities/video.entity';
 import { CreateVideoDto } from './dto/create-video.dto';
 import { UpdateVideoDto } from './dto/update-video.dto';
 
+import { User } from 'src/users/entities/user.entity';
+
 @Injectable()
 export class VideosService {
   constructor(
+    @InjectRepository(User)
+    private readonly usersRepository: Repository<User>,
+
     @InjectRepository(Video)
     private readonly videosRepository: Repository<Video>,
   ) {}
@@ -22,7 +27,8 @@ export class VideosService {
     if (!createVideoDto.hasOwnProperty('url'))
       throw new HttpException('There is not url in request body.', 400);
     const video = this.videosRepository.create();
-    video.userId = createVideoDto.userId;
+    const user = await this.usersRepository.findOne(createVideoDto.userId);
+    video.user = user;
     video.name = createVideoDto.name;
     video.game = createVideoDto.game;
     video.url = createVideoDto.url;
