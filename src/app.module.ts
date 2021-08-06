@@ -39,4 +39,4 @@ import { VideosModule } from './videos/videos.module';
   controllers: [AppController, UsersController],
   providers: [],
 })
-export class AppModule { }
+export class AppModule {}

@@ -4,7 +4,7 @@ import { IsOptional, IsString, IsEnum } from 'class-validator';
 enum Game {
   League_of_Legends,
   Overwatch,
-  PUBG_BATTLEGROUNDS
+  PUBG_BATTLEGROUNDS,
 }
 
 export class UpdateVideoDto {
@@ -21,7 +21,7 @@ export class UpdateVideoDto {
   @IsEnum(Game)
   @IsOptional()
   @ApiProperty({ type: Number, description: '동영상 게임' })
-  readonly game: number ;
+  readonly game: number;
 
   @IsString()
   @IsOptional()

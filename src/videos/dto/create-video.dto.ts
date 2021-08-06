@@ -4,7 +4,7 @@ import { IsOptional, IsString, IsEnum } from 'class-validator';
 enum Game {
   League_of_Legends,
   Overwatch,
-  PUBG_BATTLEGROUNDS
+  PUBG_BATTLEGROUNDS,
 }
 
 export class CreateVideoDto {

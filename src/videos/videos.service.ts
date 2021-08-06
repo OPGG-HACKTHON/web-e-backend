@@ -1,7 +1,7 @@
 import { Injectable, HttpException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Video } from './entities/video.entity'
+import { Video } from './entities/video.entity';
 import { CreateVideoDto } from './dto/create-video.dto';
 import { UpdateVideoDto } from './dto/update-video.dto';
 
@@ -13,16 +13,21 @@ export class VideosService {
   ) {}
 
   async create(createVideoDto: CreateVideoDto): Promise<Video> {
-    if (!createVideoDto.hasOwnProperty('userId')) throw new HttpException('There is not userId in request body.', 400);
-    if (!createVideoDto.hasOwnProperty('name')) throw new HttpException('There is not name in request body.', 400);
-    if (!createVideoDto.hasOwnProperty('game')) throw new HttpException('There is not game in request body.', 400);
-    if (!createVideoDto.hasOwnProperty('url')) throw new HttpException('There is not url in request body.', 400);
+    if (!createVideoDto.hasOwnProperty('userId'))
+      throw new HttpException('There is not userId in request body.', 400);
+    if (!createVideoDto.hasOwnProperty('name'))
+      throw new HttpException('There is not name in request body.', 400);
+    if (!createVideoDto.hasOwnProperty('game'))
+      throw new HttpException('There is not game in request body.', 400);
+    if (!createVideoDto.hasOwnProperty('url'))
+      throw new HttpException('There is not url in request body.', 400);
     const video = this.videosRepository.create();
     video.userId = createVideoDto.userId;
     video.name = createVideoDto.name;
     video.game = createVideoDto.game;
     video.url = createVideoDto.url;
-    if (createVideoDto.description) video.description = createVideoDto.description;
+    if (createVideoDto.description)
+      video.description = createVideoDto.description;
     return await this.videosRepository.save(video);
   }
 

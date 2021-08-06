@@ -1,10 +1,16 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { IsDate, IsEnum, IsNumber, IsString } from 'class-validator';
 
 enum Game {
   League_of_Legends,
   Overwatch,
-  PUBG_BATTLEGROUNDS
+  PUBG_BATTLEGROUNDS,
 }
 
 @Entity()
@@ -38,7 +44,7 @@ export class Video {
   url: string;
 
   @IsString()
-  @Column({ type: 'varchar', default: "" })
+  @Column({ type: 'varchar', default: '' })
   description: string;
 
   @IsNumber()

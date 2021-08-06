@@ -1,9 +1,27 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { VideosService } from './videos.service';
 import { CreateVideoDto } from './dto/create-video.dto';
 import { UpdateVideoDto } from './dto/update-video.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiBody,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { Video } from './entities/video.entity';
 
 @ApiTags('동영상(Video)')
@@ -50,7 +68,10 @@ export class VideosController {
   @ApiNotFoundResponse({ description: '해당 동영상 없음' })
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')
-  async update(@Param('id') id: string, @Body() updateVideoDto: UpdateVideoDto): Promise<void> {
+  async update(
+    @Param('id') id: string,
+    @Body() updateVideoDto: UpdateVideoDto,
+  ): Promise<void> {
     return await this.videosService.update(+id, updateVideoDto);
   }
 
