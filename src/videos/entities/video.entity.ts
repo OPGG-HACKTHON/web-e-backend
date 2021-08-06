@@ -8,12 +8,7 @@ import {
 } from 'typeorm';
 import { IsDate, IsEnum, IsNumber, IsString } from 'class-validator';
 import { User } from 'src/users/entities/user.entity';
-
-enum Game {
-  League_of_Legends,
-  Overwatch,
-  PUBG_BATTLEGROUNDS,
-}
+import { Game } from '../enums/game';
 
 @Entity()
 export class Video {

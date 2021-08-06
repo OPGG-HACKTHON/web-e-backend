@@ -1,11 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsString, IsEnum } from 'class-validator';
-
-enum Game {
-  League_of_Legends,
-  Overwatch,
-  PUBG_BATTLEGROUNDS,
-}
+import { Game } from '../enums/game';
 
 export class UpdateVideoDto {
   @IsString()
