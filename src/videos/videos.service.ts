@@ -13,14 +13,13 @@ export class VideosService {
   ) {}
 
   create(createVideoDto: CreateVideoDto): Promise<Video> {
-    if (!createVideoDto.userId) throw new HttpException('There is not userId in request body.', 400);
-    if (!createVideoDto.name) throw new HttpException('There is not name in request body.', 400);
-    if (!createVideoDto.game) throw new HttpException('There is not game in request body.', 400);
-    if (!createVideoDto.url) throw new HttpException('There is not url in request body.', 400);
+    if (!createVideoDto.hasOwnProperty('userId')) throw new HttpException('There is not userId in request body.', 400);
+    if (!createVideoDto.hasOwnProperty('name')) throw new HttpException('There is not name in request body.', 400);
+    if (!createVideoDto.hasOwnProperty('game')) throw new HttpException('There is not game in request body.', 400);
+    if (!createVideoDto.hasOwnProperty('url')) throw new HttpException('There is not url in request body.', 400);
     const video = this.videosRepository.create();
     video.userId = createVideoDto.userId;
     video.name = createVideoDto.name;
-    if (video.game < 0 || video.game > 2) throw new HttpException('Invalid game number.', 400);
     video.game = createVideoDto.game;
     video.url = createVideoDto.url;
     if (createVideoDto.description) video.description = createVideoDto.description;
@@ -43,7 +42,6 @@ export class VideosService {
     if (isNaN(id)) throw new HttpException('Id must be a nubmer.', 400);
     const video = await this.videosRepository.findOne(id);
     if (!video) throw new HttpException(`Video with id ${id} is none.`, 404);
-    if (video.game < 0 || video.game > 2) throw new HttpException('Invalid game number.', 400);
     await this.videosRepository.update(id, updateVideoDto);
   }
 
