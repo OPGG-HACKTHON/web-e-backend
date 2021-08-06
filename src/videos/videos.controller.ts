@@ -28,7 +28,7 @@ export class VideosController {
   @ApiOkResponse({ description: '검색 완료' })
   @ApiUnauthorizedResponse({ description: '권한이 없음' })
   @ApiBadRequestResponse({ description: '잘못된 입력' })
-  findAll(): Promise<Video[]> {
+  async findAll(): Promise<Video[]> {
     return this.videosService.findAll();
   }
 
@@ -50,8 +50,8 @@ export class VideosController {
   @ApiNotFoundResponse({ description: '해당 동영상 없음' })
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')
-  update(@Param('id') id: string, @Body() updateVideoDto: UpdateVideoDto): Promise<void> {
-    return this.videosService.update(+id, updateVideoDto);
+  async update(@Param('id') id: string, @Body() updateVideoDto: UpdateVideoDto): Promise<void> {
+    return await this.videosService.update(+id, updateVideoDto);
   }
 
   @Delete(':id')
@@ -62,7 +62,7 @@ export class VideosController {
   @ApiNotFoundResponse({ description: '해당 동영상 없음' })
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')
-  remove(@Param('id') id: string): Promise<void> {
-    return this.videosService.remove(+id);
+  async remove(@Param('id') id: string): Promise<void> {
+    return await this.videosService.remove(+id);
   }
 }

@@ -12,7 +12,7 @@ export class VideosService {
     private readonly videosRepository: Repository<Video>,
   ) {}
 
-  create(createVideoDto: CreateVideoDto): Promise<Video> {
+  async create(createVideoDto: CreateVideoDto): Promise<Video> {
     if (!createVideoDto.hasOwnProperty('userId')) throw new HttpException('There is not userId in request body.', 400);
     if (!createVideoDto.hasOwnProperty('name')) throw new HttpException('There is not name in request body.', 400);
     if (!createVideoDto.hasOwnProperty('game')) throw new HttpException('There is not game in request body.', 400);
@@ -23,7 +23,7 @@ export class VideosService {
     video.game = createVideoDto.game;
     video.url = createVideoDto.url;
     if (createVideoDto.description) video.description = createVideoDto.description;
-    return this.videosRepository.save(video);
+    return await this.videosRepository.save(video);
   }
 
   async findAll(): Promise<Video[]> {
