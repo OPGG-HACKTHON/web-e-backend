@@ -82,7 +82,7 @@ export class UsersService {
       userId: userData.userId,
     });
     if (user) {
-      throw new HttpException('아이디 중복', 401); //throw는 return 기능까지 수행한다.
+      throw new HttpException('아이디 중복', 403); //throw는 return 기능까지 수행한다.
     }
 
     const hashedPassword = await bcrypt.hash(

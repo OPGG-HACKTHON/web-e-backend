@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
   Param,
   Patch,
   Post,
@@ -39,12 +40,23 @@ export class UsersController {
     description: '회원가입을 진행한다.',
   })
   @ApiCreatedResponse({ description: '회원가입 완료' })
-  @ApiResponse({ status: 400, description: '입력정보 오류' })
+  @ApiResponse({ status: 400, description: '입력값 오류' })
+  @ApiResponse({ status: 403, description: '아이디 중복 오류' })
   @ApiBody({ type: CreateUserDto })
   async register(@Body() userData: CreateUserDto) {
-    await this.userService.register(userData);
-    return { statusCode: 201, message: '회원가입 완료' };
-    //async await을 붙여줘야 service에서 내뿜은 에러를 받을 수 있다.
+    try {
+      await this.userService.register(userData);
+      return { statusCode: 201, message: '회원가입 완료' };
+      //async await을 붙여줘야 service에서 내뿜은 에러를 받을 수 있다.
+    } catch (err) {
+      throw new HttpException(
+        {
+          statusCode: err.status,
+          message: err.message,
+        },
+        err.status,
+      );
+    }
   }
 
   @Get(':userId')
@@ -56,10 +68,19 @@ export class UsersController {
   @ApiBadRequestResponse({ description: '입력값 오류' })
   @ApiResponse({ status: 401, description: '사용자 없음' })
   async findOne(@Param('userId') userId: string) {
-    const data = await this.userService.findOne(userId);
-    return { statusCode: 200, message: '데이터 반환 성공', data };
+    try {
+      const data = await this.userService.findOne(userId);
+      return { statusCode: 200, message: '데이터 반환 성공', data };
+    } catch (err) {
+      throw new HttpException(
+        {
+          statusCode: err.status,
+          message: err.message,
+        },
+        err.status,
+      );
+    }
   }
-
   @ApiBearerAuth('access-token') //Bearer 토큰이 필요, 이름으로 대체
   @ApiOperation({
     summary: '유저 삭제',
@@ -72,8 +93,18 @@ export class UsersController {
   @userRole(Role.USER) // USER Role을 가진 경우만 접근 가능
   @UseGuards(JwtAuthGuard, RoleGuard) // 두개의 Guard를 통과해야 api 접근
   async deleteUser(@Body() deleteData: LoginUserDto) {
-    await this.userService.deleteUser(deleteData);
-    return { statusCode: 200, message: '삭제 완료' };
+    try {
+      await this.userService.deleteUser(deleteData);
+      return { statusCode: 200, message: '삭제 완료' };
+    } catch (err) {
+      throw new HttpException(
+        {
+          statusCode: err.status,
+          message: err.message,
+        },
+        err.status,
+      );
+    }
   }
 
   @ApiBearerAuth('access-token') //Bearer 토큰이 필요, 이름으로 대체
@@ -91,8 +122,18 @@ export class UsersController {
     @Param('userId') userId: string,
     @Body() updateData: UpdateUserDto,
   ) {
-    await this.userService.updateUser(userId, updateData);
-    return { statusCode: 200, message: '적용완료' };
+    try {
+      await this.userService.updateUser(userId, updateData);
+      return { statusCode: 200, message: '적용완료' };
+    } catch (err) {
+      throw new HttpException(
+        {
+          statusCode: err.status,
+          message: err.message,
+        },
+        err.status,
+      );
+    }
   }
 
   @ApiBearerAuth('access-token') //Bearer 토큰이 필요, 이름으로 대체
