@@ -82,25 +82,25 @@ export class User {
   userPhoto: string;
 
   @IsString()
-  @IsEnum(GameFeed, { each: true })
+  @IsEnum(GameFeed)
   @ApiProperty({ type: String, description: '사용자 게임 Default 피드' })
-  @Column({ nullable: true })
+  @Column({ type: 'enum', enum: GameFeed, default: GameFeed.LOL })
   userFeed: string;
 
   @IsString()
-  @IsEnum(LOLTier, { each: true })
+  @IsEnum(LOLTier)
   @ApiProperty({ type: String, description: 'league of legend(ll) 티어' })
   @Column({ type: 'enum', enum: LOLTier, default: LOLTier.UNRANKED })
   lolTier: string;
 
   @IsString()
-  @IsEnum(PUBGTier, { each: true })
+  @IsEnum(PUBGTier)
   @ApiProperty({ type: String, description: 'battle ground(bg) 티어' })
   @Column({ type: 'enum', enum: PUBGTier, default: PUBGTier.UNRANKED })
   pubgTier: string;
 
   @IsString()
-  @IsEnum(WatchTier, { each: true })
+  @IsEnum(WatchTier)
   @ApiProperty({ type: String, description: 'overwatch(ow) 티어' })
   @Column({ type: 'enum', enum: WatchTier, default: WatchTier.UNRANKED })
   watchTier: string;
