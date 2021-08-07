@@ -35,6 +35,10 @@ export class AuthService {
       userEmail: user.userEmail,
       userPhoto: user.userPhoto,
       userIntro: user.userIntro,
+      userFeed: user.userFeed,
+      lolTier: user.lolTier,
+      pubgTier: user.pubgTier,
+      watchTier: user.watchTier,
       userRole: user.userRole,
     };
     return {

@@ -17,9 +17,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     //payload값 return
     return {
       id: payload.userId,
-      intro: payload.userIntro,
-      photo: payload.userPhoto,
       email: payload.userEmail,
+      photo: payload.userPhoto,
+      intro: payload.userIntro,
+      feed: payload.userFeed,
+      lolTier: payload.lolTier,
+      pubgTier: payload.pubgTier,
+      watchTier: payload.watchTier,
       role: payload.userRole,
     };
   }

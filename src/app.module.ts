@@ -26,7 +26,7 @@ import { User } from './users/entities/user.entity';
         password: configService.get('database.password'),
         database: configService.get('database.name'),
         entities: [User],
-        synchronize: false,
+        synchronize: true,
       }),
     }),
     UsersModule,

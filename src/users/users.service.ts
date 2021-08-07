@@ -74,6 +74,10 @@ export class UsersService {
       throw new HttpException('비밀번호가 없습니다.', 400);
     }
 
+    if (!userData.userName) {
+      throw new HttpException('유저명이 없습니다.', 400);
+    }
+
     const user = await this.usersRepository.findOne({
       userId: userData.userId,
     });
@@ -88,6 +92,7 @@ export class UsersService {
     await this.usersRepository.save({
       //usersRepository.save가 DB에 저장시키는거
       userId: userData.userId,
+      userName: userData.userName,
       userPassword: hashedPassword,
       userEmail: userData.userEmail,
     });
