@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsEnum, IsString } from 'class-validator';
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
+import { Video } from 'src/videos/entities/video.entity';
 // import { movie } from '../movie/movie.entity';
 
 //사용자 권한
@@ -114,6 +115,10 @@ export class User {
   @ApiProperty({ type: String, description: '관리자 여부' })
   @Column({ type: 'enum', enum: Role, default: Role.USER })
   userRole: Role;
+
+  @ApiProperty({ type: Video, description: '사용자 동영상' })
+  @OneToMany((type) => Video, (video) => video.user)
+  videos: Video[];
 
   //   @OneToMany(() => Movie, (Movie) => Movie.user)
   //   movies: Movie[];
