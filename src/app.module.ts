@@ -9,6 +9,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { User } from './users/entities/user.entity';
 import { Video } from './videos/entities/video.entity';
 import { VideosModule } from './videos/videos.module';
+import { ImageModule } from './image/image.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { VideosModule } from './videos/videos.module';
     AuthModule,
     TypeOrmModule.forFeature([User]), //users.module.ts에 있는걸 app.module.ts에도 동일하게 넣어준 모습
     VideosModule,
+    ImageModule,
   ],
   controllers: [AppController, UsersController],
   providers: [],
