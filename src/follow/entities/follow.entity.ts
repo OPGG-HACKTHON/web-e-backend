@@ -6,7 +6,6 @@ import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 
 @Entity('follow')
 export class Follow {
-  // userId and followingId is Primary Key
   @IsString()
   @ApiProperty({ type: User, description: '팔로우 요청하는 사람' })
   @PrimaryColumn({ name: 'userId' })

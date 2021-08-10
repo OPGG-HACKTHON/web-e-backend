@@ -13,12 +13,9 @@ export class FollowService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {}
-  //팔로우 만들기
   async createFollow(followData: CreateFollowDto) {
     const user = await this.userRepository.findOne(followData.userId);
     const following = await this.userRepository.findOne(followData.followingId);
-
-    //error handling
     if (!user) throw new HttpException('사용자가 없습니다', 404);
     if (!following) throw new HttpException('팔로우할 사용자가 없습니다', 404);
     if (user.userId === following.userId)
@@ -38,7 +35,7 @@ export class FollowService {
       };
     }
   }
-  //이미 팔로우 했는지 체크
+
   async alreadyFollow(followData: CreateFollowDto): Promise<boolean> {
     const follow = await this.followRepository.findAndCount({
       where: [
