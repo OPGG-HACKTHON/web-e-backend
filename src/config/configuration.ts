@@ -14,4 +14,8 @@ export default () => ({
     saltOrRounds: Number(process.env.BCRYPT_CONSTANT_VALUE),
   },
   expirationTime: process.env.JWT_EXPIRATION_TIME,
+  awsS3BucketName: process.env.AWS_S3_BUCKET_NAME,
+  awsS3Region: process.env.AWS_REGION,
+  awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  awsSecretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
 });
