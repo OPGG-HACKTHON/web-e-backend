@@ -17,6 +17,8 @@ export class FollowService {
   async createFollow(followData: CreateFollowDto) {
     const user = await this.userRepository.findOne(followData.userId);
     const following = await this.userRepository.findOne(followData.followingId);
+
+    //error handling
     if (!user) throw new HttpException('사용자가 없습니다', 404);
     if (!following) throw new HttpException('팔로우할 사용자가 없습니다', 404);
     if (user.userId === following.userId)
