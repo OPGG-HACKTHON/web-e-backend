@@ -32,7 +32,7 @@ import { FollowModule } from './follow/follow.module';
         password: configService.get('database.password'),
         database: configService.get('database.name'),
         entities: [User, Video, Follow],
-        synchronize: false,
+        synchronize: true,
       }),
     }),
     UsersModule,

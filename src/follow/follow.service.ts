@@ -46,4 +46,34 @@ export class FollowService {
     if (follow[1] === 1) return true;
     else return false;
   }
+
+  async getMyFollowers(userId: string) {
+    const followers = await this.followRepository.findAndCount({
+      where: [{ followingId: userId }],
+      select: ['userId'],
+    });
+    // const followers = await this.userRepository.findAndCount({
+    //   where: [{userId: followingIds[0].forEach((user) => user.userId) }],
+    // });
+    return followers;
+  }
+
+  async getMyFollowing(userId: string) {
+    const followers = await this.followRepository
+      .createQueryBuilder('f')
+      .innerJoinAndSelect(User, 'u', 'f.followingId = u.userId')
+      .where('f.followingId = :userId', { userId: userId })
+      .getMany();
+    // ({
+    //   join: {
+    //     alias: 'follow',
+    //     innerJoinAndSelect: {
+    //       followingId: 'follow',
+    //     },
+    //   },
+    //   where: [{ userId: userId }],
+    //   //   select: ['following'],
+    // });
+    return followers;
+  }
 }
