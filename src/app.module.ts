@@ -8,6 +8,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { User } from './users/entities/user.entity';
 import { Video } from './videos/entities/video.entity';
+import { Follow } from './follow/entities/follow.entity';
 import { VideosModule } from './videos/videos.module';
 import { ImageModule } from './image/image.module';
 
@@ -28,8 +29,8 @@ import { ImageModule } from './image/image.module';
         username: configService.get('database.user'),
         password: configService.get('database.password'),
         database: configService.get('database.name'),
-        entities: [User, Video],
-        synchronize: false,
+        entities: [User, Video, Follow],
+        synchronize: true,
       }),
     }),
     UsersModule,
