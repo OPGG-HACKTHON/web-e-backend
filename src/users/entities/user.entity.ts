@@ -117,15 +117,15 @@ export class User {
   userRole: Role;
 
   @ApiProperty({ type: Video, description: '사용자 동영상' })
-  @OneToMany((type) => Video, (video) => video.user)
+  @OneToMany(() => Video, (video) => video.user)
   videos: Video[];
 
   //follower 기능 m:n connection, self join
-  @ApiProperty({ type: Follow, description: '내가 팔로우하는 유저' })
+  @ApiProperty({ type: Follow, description: '팔로우 요청하는 사용자' })
+  @OneToMany(() => Follow, (follow) => follow.user)
+  user: Follow[];
+
+  @ApiProperty({ type: Video, description: '팔로우 당하는 사용자' })
   @OneToMany(() => Follow, (follow) => follow.following)
   following: Follow[];
-
-  @ApiProperty({ type: Video, description: '나를 팔로우 하는 유저' })
-  @OneToMany(() => Follow, (follow) => follow.follower)
-  followers: Follow[];
 }
