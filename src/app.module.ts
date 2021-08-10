@@ -11,8 +11,6 @@ import { Video } from './videos/entities/video.entity';
 import { Follow } from './follow/entities/follow.entity';
 import { VideosModule } from './videos/videos.module';
 import { ImageModule } from './image/image.module';
-import { FollowController } from './follow/follow.controller';
-import { FollowModule } from './follow/follow.module';
 
 @Module({
   imports: [
@@ -40,9 +38,8 @@ import { FollowModule } from './follow/follow.module';
     TypeOrmModule.forFeature([User]), //users.module.ts에 있는걸 app.module.ts에도 동일하게 넣어준 모습
     VideosModule,
     ImageModule,
-    FollowModule,
   ],
-  controllers: [AppController, UsersController, FollowController],
+  controllers: [AppController, UsersController],
   providers: [],
 })
 export class AppModule {}

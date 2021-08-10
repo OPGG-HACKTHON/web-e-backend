@@ -1,8 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsEnum, IsString } from 'class-validator';
-import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  PrimaryColumn,
+  RelationCount,
+} from 'typeorm';
 import { Video } from 'src/videos/entities/video.entity';
 import { Follow } from 'src/follow/entities/follow.entity';
+// import { movie } from '../movie/movie.entity';
 
 //사용자 권한
 export enum Role {
@@ -111,7 +120,7 @@ export class User {
   userIntro: string;
 
   @IsString()
-  @IsEnum(Role)
+  @IsEnum(Role, { each: true })
   @ApiProperty({ type: String, description: '관리자 여부' })
   @Column({ type: 'enum', enum: Role, default: Role.USER })
   userRole: Role;
@@ -121,11 +130,10 @@ export class User {
   videos: Video[];
 
   //follower 기능 m:n connection, self join
-  @ApiProperty({ type: Follow, description: '팔로우 요청하는 사용자' })
-  @OneToMany(() => Follow, (follow) => follow.user)
-  user: Follow[];
 
-  @ApiProperty({ type: Video, description: '팔로우 당하는 사용자' })
   @OneToMany(() => Follow, (follow) => follow.following)
   following: Follow[];
+
+  @OneToMany(() => Follow, (follow) => follow.follower)
+  followers: Follow[];
 }
