@@ -22,7 +22,7 @@ import { FollowService } from './follow.service';
 @Controller('follow')
 export class FollowController {
   constructor(private readonly followService: FollowService) {}
-
+  // 팔로우 관련
   @ApiTags('팔로우 (Follow)')
   @ApiOperation({ description: '팔로우 신청' })
   @ApiResponse({ status: 201, description: '팔로우 성공' })
