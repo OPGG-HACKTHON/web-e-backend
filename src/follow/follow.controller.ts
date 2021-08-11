@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   Param,
@@ -101,6 +102,31 @@ export class FollowController {
         Following: following,
         FollowingCount: following.length,
       };
+    } catch (err) {
+      throw new HttpException(
+        {
+          statusCode: err.status,
+          message: err.message,
+        },
+        err.status,
+      );
+    }
+  }
+
+  @ApiBearerAuth('access-token')
+  @userRole(Role.USER)
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @ApiOperation({
+    description: '언팔로우 진행하기',
+    summary: '언팔로우',
+  })
+  @ApiResponse({ status: 200, description: '언팔로우' })
+  @ApiResponse({ status: 404, description: '팔로우 목록 없음' })
+  @Delete()
+  async unfollow(@Body() followData: CreateFollowDto) {
+    try {
+      await this.followService.unfollow(followData);
+      return { statusCode: 200, message: '언팔로우', data: followData };
     } catch (err) {
       throw new HttpException(
         {
