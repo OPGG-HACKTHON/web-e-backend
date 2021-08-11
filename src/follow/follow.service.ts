@@ -13,6 +13,7 @@ export class FollowService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {}
+
   async createFollow(followData: CreateFollowDto) {
     const user = await this.userRepository.findOne(followData.userId);
     const following = await this.userRepository.findOne(followData.followingId);
@@ -32,48 +33,54 @@ export class FollowService {
       return {
         statusCode: 201,
         message: '팔로잉 성공',
+        data: { userId: user.userId, followingId: following.userId },
       };
     }
   }
 
   async alreadyFollow(followData: CreateFollowDto): Promise<boolean> {
     const follow = await this.followRepository.findAndCount({
-      where: [
-        { userId: followData.userId },
-        { followingId: followData.followingId },
-      ],
+      where: { userId: followData.userId, followingId: followData.followingId },
     });
     if (follow[1] === 1) return true;
     else return false;
   }
-
+  //userId 팔로잉 유저 목록, QueryBuilder로 join 후, 가져옴
   async getMyFollowers(userId: string) {
-    const followers = await this.followRepository.findAndCount({
-      where: [{ followingId: userId }],
-      select: ['userId'],
-    });
-    // const followers = await this.userRepository.findAndCount({
-    //   where: [{userId: followingIds[0].forEach((user) => user.userId) }],
-    // });
-    return followers;
-  }
-
-  async getMyFollowing(userId: string) {
+    //userId validation
+    const validUser = await this.userRepository.findOne({ userId: userId });
+    if (!validUser) throw new HttpException('사용자가 없습니다', 404);
+    //follower logic
     const followers = await this.followRepository
       .createQueryBuilder('f')
-      .innerJoinAndSelect(User, 'u', 'f.followingId = u.userId')
+      .innerJoin(User, 'u', 'f.userId = u.userId')
+      .select([
+        'u.userId AS userId',
+        'u.userName AS userName',
+        'u.userPhoto AS userPhoto',
+        'u.userIntro AS userIntro',
+      ])
       .where('f.followingId = :userId', { userId: userId })
-      .getMany();
-    // ({
-    //   join: {
-    //     alias: 'follow',
-    //     innerJoinAndSelect: {
-    //       followingId: 'follow',
-    //     },
-    //   },
-    //   where: [{ userId: userId }],
-    //   //   select: ['following'],
-    // });
+      .getRawMany();
     return followers;
+  }
+  //userId 팔로잉 유저 목록, QueryBuilder로 join 후, 가져옴
+  async getMyFollowings(userId: string) {
+    //userId validation
+    const validUser = await this.userRepository.findOne({ userId: userId });
+    if (!validUser) throw new HttpException('사용자가 없습니다', 404);
+    //follwingLogic
+    const following = await this.followRepository
+      .createQueryBuilder('f')
+      .innerJoin(User, 'u', 'f.followingId = u.userId')
+      .select([
+        'u.userId AS userId',
+        'u.userName AS userName',
+        'u.userPhoto AS userPhoto',
+        'u.userIntro AS userIntro',
+      ])
+      .where('f.userId = :userId', { userId: userId })
+      .getRawMany();
+    return following;
   }
 }

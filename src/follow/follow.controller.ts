@@ -26,14 +26,20 @@ import { FollowService } from './follow.service';
 export class FollowController {
   constructor(private readonly followService: FollowService) {}
 
-  @ApiOperation({ description: '팔로우 신청' })
+  @ApiOperation({
+    description: ':userId:가 :followingId 로 팔로잉을 진행한다.',
+    summary: '팔로우 시작',
+  })
   @ApiResponse({ status: 201, description: '팔로우 성공' })
   @ApiResponse({ status: 400, description: '입력데이터 오류' })
   @ApiResponse({ status: 401, description: '권한 오류' })
   @ApiResponse({ status: 404, description: '사용자 없음' })
   @ApiResponse({ status: 405, description: '자신 팔로우' })
   @ApiResponse({ status: 406, description: '이미 팔로우한 사용자' })
-  @ApiBody({ type: CreateFollowDto, description: '팔로우를 시작한다' })
+  @ApiBody({
+    type: CreateFollowDto,
+    description: '사용자ID(userId), Follow할 ID (FollowingId)',
+  })
   @ApiBearerAuth('access-token')
   @userRole(Role.USER)
   @UseGuards(JwtAuthGuard, RoleGuard)
@@ -54,14 +60,20 @@ export class FollowController {
   }
 
   // userId의 팔로워들 구하기 (userId를 팔로우하는 사람들 가져오기)
+  @ApiOperation({
+    description: '특정 유저 팔로워 찾기',
+    summary: '팔로워 찾기',
+  })
+  @ApiResponse({ status: 200, description: '팔로워 목록' })
+  @ApiResponse({ status: 404, description: '사용자 없음' })
   @Get('/follower/:userId')
   async getMyFollowers(@Param('userId') userId: string) {
     try {
-      const follower = await this.followService.getMyFollowers(userId);
+      const followers = await this.followService.getMyFollowers(userId);
       return {
         StatusCode: 200,
-        Follower: follower[0],
-        FollowerCount: follower[1],
+        Follower: followers,
+        FollowerCount: followers.length,
       };
     } catch (err) {
       throw new HttpException(
@@ -73,13 +85,20 @@ export class FollowController {
       );
     }
   }
+  // userId가 팔로잉하는 사용자들 구하기 (userId가 팔로우하는 사람들 가져오기)
+  @ApiOperation({
+    description: '특정 유저 팔로잉 목록 찾기',
+    summary: '팔로잉 목록',
+  })
+  @ApiResponse({ status: 200, description: '팔로잉 목록' })
+  @ApiResponse({ status: 404, description: '사용자 없음' })
   @Get('/following/:userId')
-  async getMyFollowing(@Param('userId') userId: string) {
+  async getMyFollowings(@Param('userId') userId: string) {
     try {
-      const following = await this.followService.getMyFollowing(userId);
+      const following = await this.followService.getMyFollowings(userId);
       return {
         StatusCode: 200,
-        Follower: following,
+        Following: following,
         FollowingCount: following.length,
       };
     } catch (err) {
