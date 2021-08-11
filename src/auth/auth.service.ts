@@ -3,12 +3,14 @@ import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { LoginUserDto } from 'src/users/dto/login-user.dto';
 import * as bcrypt from 'bcrypt';
+import { FollowService } from 'src/follow/follow.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private followService: FollowService,
   ) {}
 
   async validateUser(loginData: LoginUserDto): Promise<any> {
@@ -41,9 +43,11 @@ export class AuthService {
       watchTier: user.watchTier,
       userRole: user.userRole,
     };
+    const followers = await this.followService.getMyFollowers(user.userId);
     return {
       statusCode: 201,
       message: '로그인 성공, 토큰 발행',
+      follower: followers,
       access_token: this.jwtService.sign(payload),
     };
   }

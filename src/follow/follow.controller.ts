@@ -67,14 +67,15 @@ export class FollowController {
   })
   @ApiResponse({ status: 200, description: '팔로워 목록' })
   @ApiResponse({ status: 404, description: '사용자 없음' })
-  @Get('/follower/:userId')
+  @Get(':userId//follower')
   async getMyFollowers(@Param('userId') userId: string) {
     try {
       const followers = await this.followService.getMyFollowers(userId);
       return {
-        StatusCode: 200,
-        Follower: followers,
-        FollowerCount: followers.length,
+        statusCode: 200,
+        message: '팔로워 리스트',
+        followers: followers,
+        followersCount: followers.length,
       };
     } catch (err) {
       throw new HttpException(
@@ -93,14 +94,15 @@ export class FollowController {
   })
   @ApiResponse({ status: 200, description: '팔로잉 목록' })
   @ApiResponse({ status: 404, description: '사용자 없음' })
-  @Get('/following/:userId')
+  @Get(':userId/following')
   async getMyFollowings(@Param('userId') userId: string) {
     try {
       const following = await this.followService.getMyFollowings(userId);
       return {
         StatusCode: 200,
-        Following: following,
-        FollowingCount: following.length,
+        message: '팔로잉 유저 리스트',
+        followings: following,
+        followingsCounts: following.length,
       };
     } catch (err) {
       throw new HttpException(
