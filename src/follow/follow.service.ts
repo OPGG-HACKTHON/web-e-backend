@@ -37,7 +37,7 @@ export class FollowService {
       };
     }
   }
-
+  //이미 팔로우했는지 확인
   async alreadyFollow(followData: CreateFollowDto): Promise<boolean> {
     const follow = await this.followRepository.findAndCount({
       where: { userId: followData.userId, followingId: followData.followingId },
@@ -82,5 +82,19 @@ export class FollowService {
       .where('f.userId = :userId', { userId: userId })
       .getRawMany();
     return following;
+  }
+
+  async unfollow(followData: CreateFollowDto) {
+    const validFollow = await this.followRepository.findOne({
+      userId: followData.userId,
+      followingId: followData.followingId,
+    });
+    if (!validFollow) throw new HttpException('팔로우 중이 아닙니다', 404);
+    else {
+      return await this.followRepository.delete({
+        userId: validFollow.userId,
+        followingId: validFollow.followingId,
+      });
+    }
   }
 }

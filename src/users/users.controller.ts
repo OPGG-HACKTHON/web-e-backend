@@ -95,7 +95,7 @@ export class UsersController {
   async deleteUser(@Body() deleteData: LoginUserDto) {
     try {
       await this.userService.deleteUser(deleteData);
-      return { statusCode: 200, message: '삭제 완료' };
+      return { statusCode: 200, message: '삭제 완료', data: deleteData };
     } catch (err) {
       throw new HttpException(
         {
