@@ -11,6 +11,8 @@ import { Video } from './videos/entities/video.entity';
 import { Follow } from './follow/entities/follow.entity';
 import { VideosModule } from './videos/videos.module';
 import { ImageModule } from './image/image.module';
+import { FollowController } from './follow/follow.controller';
+import { FollowModule } from './follow/follow.module';
 
 @Module({
   imports: [
@@ -30,7 +32,7 @@ import { ImageModule } from './image/image.module';
         password: configService.get('database.password'),
         database: configService.get('database.name'),
         entities: [User, Video, Follow],
-        synchronize: false,
+        synchronize: true,
       }),
     }),
     UsersModule,
@@ -38,8 +40,9 @@ import { ImageModule } from './image/image.module';
     TypeOrmModule.forFeature([User]), //users.module.ts에 있는걸 app.module.ts에도 동일하게 넣어준 모습
     VideosModule,
     ImageModule,
+    FollowModule,
   ],
-  controllers: [AppController, UsersController],
+  controllers: [AppController, UsersController, FollowController],
   providers: [],
 })
 export class AppModule {}
