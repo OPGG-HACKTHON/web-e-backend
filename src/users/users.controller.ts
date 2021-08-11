@@ -66,7 +66,7 @@ export class UsersController {
   })
   @ApiOkResponse({ description: '유저 정보 반환', type: User })
   @ApiBadRequestResponse({ description: '입력값 오류' })
-  @ApiResponse({ status: 401, description: '사용자 없음' })
+  @ApiResponse({ status: 404, description: '사용자 없음' })
   async findOne(@Param('userId') userId: string) {
     try {
       const data = await this.userService.findOne(userId);
@@ -87,6 +87,7 @@ export class UsersController {
     description: '아이디를 삭제한다.',
   })
   @ApiUnauthorizedResponse({ description: '사용자 권한오류' })
+  @ApiResponse({ status: 404, description: '해당 사용자 없음' })
   @ApiBadRequestResponse({ description: '입력값 오류' })
   @ApiOkResponse({ description: '삭제 완료' })
   @Delete(':userId')
@@ -113,6 +114,7 @@ export class UsersController {
     description: '가능한 유저 정보를 갱신한다.',
   })
   @ApiUnauthorizedResponse({ description: '사용자 권한오류' })
+  @ApiResponse({ status: 404, description: '해당 사용자 없음' })
   @ApiBadRequestResponse({ description: '입력값 오류' })
   @ApiOkResponse({ description: '적용완료' })
   @Patch(':userId')

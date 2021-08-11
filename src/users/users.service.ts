@@ -24,7 +24,7 @@ export class UsersService {
       userId: userId,
     });
     if (!user) {
-      throw new HttpException('사용자가 존재하지 않습니다.', 401); //throw는 return 기능까지 수행한다.
+      throw new HttpException('사용자가 존재하지 않습니다.', 404); //throw는 return 기능까지 수행한다.
     }
 
     return await this.usersRepository.findOne(
@@ -45,7 +45,7 @@ export class UsersService {
     });
 
     if (!user) {
-      throw new HttpException('해당 사용자 없음', 400); //throw는 return 기능까지 수행한다.
+      throw new HttpException('해당 사용자 없음', 404); //throw는 return 기능까지 수행한다.
     }
 
     const isMatch = await bcrypt.compare(
@@ -117,7 +117,7 @@ export class UsersService {
     });
 
     if (!user) {
-      throw new HttpException('해당 사용자 없음', 400); //throw는 return 기능까지 수행한다.
+      throw new HttpException('해당 사용자 없음', 404); //throw는 return 기능까지 수행한다.
     } else {
       if (!updateData.userPassword) updateData.userPassword = user.userPassword;
       else {
@@ -128,6 +128,16 @@ export class UsersService {
         updateData.userPassword = hashedPassword;
       }
       this.usersRepository.update(userId, updateData);
+    }
+  }
+
+  //login시 updateLogic
+  async updateLoginAt(userId: string) {
+    const user = await this.usersRepository.findOne({ userId: userId });
+    if (!user) throw new HttpException('해당 사용자 없음', 404);
+    else {
+      user.loginAt = new Date();
+      await this.usersRepository.update(user.userId, user);
     }
   }
 }

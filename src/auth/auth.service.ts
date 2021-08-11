@@ -32,6 +32,13 @@ export class AuthService {
   }
 
   async login(user: any): Promise<any> {
+    //get followers
+    const followers = await this.followService.getMyFollowers(user.userId);
+    //get new Followers
+    const newFollowers = await this.followService.getNewFollowers(user.userId);
+    //update recent loginTime
+    const loginAt = await this.usersService.updateLoginAt(user.userId);
+
     const payload = {
       userId: user.userId,
       userEmail: user.userEmail,
@@ -42,12 +49,13 @@ export class AuthService {
       pubgTier: user.pubgTier,
       watchTier: user.watchTier,
       userRole: user.userRole,
+      recentLoginAt: loginAt,
     };
-    const followers = await this.followService.getMyFollowers(user.userId);
     return {
       statusCode: 201,
       message: '로그인 성공, 토큰 발행',
-      follower: followers,
+      followers: followers,
+      newFollowers: newFollowers,
       access_token: this.jwtService.sign(payload),
     };
   }
