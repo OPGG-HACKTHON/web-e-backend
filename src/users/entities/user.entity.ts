@@ -3,6 +3,7 @@ import { IsEmail, IsEnum, IsString } from 'class-validator';
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 import { Video } from 'src/videos/entities/video.entity';
 import { Follow } from 'src/follow/entities/follow.entity';
+import { timestamp } from 'rxjs';
 //사용자 권한
 export enum Role {
   ADMIN = 'ADMIN',
@@ -54,51 +55,69 @@ export class User {
   @ApiProperty({ type: String, description: '로그인 ID' })
   @PrimaryColumn()
   userId: string;
+
   @IsString()
   @ApiProperty({ type: String, description: '유저 명' })
   @Column()
   userName: string;
+
   @IsString()
   @ApiProperty({ type: String, description: '사용자 비밀번호' })
   @Column()
   userPassword: string;
+
   @IsEmail()
   @ApiProperty({ example: 'watpl@gmail.com', description: '사용자 이메일' })
   @Column()
   userEmail: string;
+
   @IsString()
   @ApiProperty({ type: String, description: '사용자프로필' })
   @Column({ nullable: true })
   userPhoto: string;
+
   @IsString()
   @IsEnum(GameFeed)
   @ApiProperty({ type: String, description: '사용자 게임 Default 피드' })
   @Column({ type: 'enum', enum: GameFeed, default: GameFeed.LOL })
   userFeed: string;
+
   @IsString()
   @IsEnum(LOLTier)
   @ApiProperty({ type: String, description: 'league of legend(ll) 티어' })
   @Column({ type: 'enum', enum: LOLTier, default: LOLTier.UNRANKED })
   lolTier: string;
+
   @IsString()
   @IsEnum(PUBGTier)
   @ApiProperty({ type: String, description: 'battle ground(bg) 티어' })
   @Column({ type: 'enum', enum: PUBGTier, default: PUBGTier.UNRANKED })
   pubgTier: string;
+
   @IsString()
   @IsEnum(WatchTier)
   @ApiProperty({ type: String, description: 'overwatch(ow) 티어' })
   @Column({ type: 'enum', enum: WatchTier, default: WatchTier.UNRANKED })
   watchTier: string;
+
   @IsString()
   @ApiProperty({ type: String, description: '사용자 소개' })
   @Column({ nullable: true })
   userIntro: string;
+
   @IsString()
   @IsEnum(Role)
   @ApiProperty({ type: String, description: '관리자 여부' })
   @Column({ type: 'enum', enum: Role, default: Role.USER })
   userRole: Role;
+
+  @ApiProperty({ type: timestamp, description: '최근 로그인 시간' })
+  @Column({
+    nullable: false,
+    default: () => 'CURRENT_TIMESTAMP',
+    type: 'timestamp',
+  })
+  loginAt: Date;
 
   @ApiProperty({ type: Video, description: '사용자 동영상' })
   @OneToMany(() => Video, (video) => video.user)

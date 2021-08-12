@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
-import { UsersController } from './users/users.controller';
 import configuration from './config/configuration';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -11,7 +10,6 @@ import { Video } from './videos/entities/video.entity';
 import { Follow } from './follow/entities/follow.entity';
 import { VideosModule } from './videos/videos.module';
 import { ImageModule } from './image/image.module';
-import { FollowController } from './follow/follow.controller';
 import { FollowModule } from './follow/follow.module';
 
 @Module({
@@ -42,7 +40,7 @@ import { FollowModule } from './follow/follow.module';
     ImageModule,
     FollowModule,
   ],
-  controllers: [AppController, UsersController, FollowController],
+  controllers: [AppController],
   providers: [],
 })
 export class AppModule {}

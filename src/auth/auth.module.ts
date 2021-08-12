@@ -7,11 +7,13 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { RoleGuard } from './role.guard';
 import { ConfigService } from '@nestjs/config';
+import { FollowModule } from 'src/follow/follow.module';
 
 @Module({
   imports: [
     UsersModule,
     PassportModule,
+    FollowModule,
     //.env에서 값 사용을 위함.
     JwtModule.registerAsync({
       useFactory: (configService: ConfigService) => {
