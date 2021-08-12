@@ -103,7 +103,7 @@ export class FollowService {
     const validUser = await this.userRepository.findOne({ userId: userId });
     if (!validUser) throw new HttpException('사용자가 없습니다', 404);
     else {
-      //follwingLogic
+      //follwing Alarm Logic
       return await this.followRepository
         .createQueryBuilder('f')
         .innerJoin(User, 'u', 'f.userId = u.userId')
@@ -113,8 +113,9 @@ export class FollowService {
           'u.userPhoto AS userPhoto',
           'u.userIntro AS userIntro',
         ])
-        .where('f.followingId = :userId AND u.loginAt <= f.createdAt', {
+        .where('f.followingId = :userId AND :loginAt <= f.createdAt', {
           userId: userId,
+          loginAt: validUser.loginAt,
         })
         .getRawMany();
     }

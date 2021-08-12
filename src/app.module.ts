@@ -11,8 +11,6 @@ import { Follow } from './follow/entities/follow.entity';
 import { VideosModule } from './videos/videos.module';
 import { ImageModule } from './image/image.module';
 import { FollowModule } from './follow/follow.module';
-import { UsersController } from './users/users.controller';
-import { FollowController } from './follow/follow.controller';
 
 @Module({
   imports: [
@@ -42,7 +40,7 @@ import { FollowController } from './follow/follow.controller';
     ImageModule,
     FollowModule,
   ],
-  controllers: [AppController, UsersController, FollowController],
+  controllers: [AppController],
   providers: [],
 })
 export class AppModule {}
