@@ -19,7 +19,8 @@ export class AppController {
   @UseGuards(LocalAuthGuard)
   @ApiOperation({
     summary: '사용자 로그인',
-    description: '로그인을 진행한다',
+    description:
+      '로그인을 진행한다. Follower 목록과(followers), 새로추가된 Follwer 목록을 보여준다(newFollowers)',
   })
   @ApiOkResponse({
     description: '유저 로그인',

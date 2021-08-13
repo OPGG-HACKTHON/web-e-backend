@@ -57,7 +57,7 @@ export class FollowService {
       .select([
         'u.userId AS userId',
         'u.userName AS userName',
-        'u.userPhoto AS userPhoto',
+        'u.userPhotoURL AS userPhotoURL',
         'u.userIntro AS userIntro',
       ])
       .where('f.followingId = :userId', { userId: userId })
@@ -76,7 +76,7 @@ export class FollowService {
       .select([
         'u.userId AS userId',
         'u.userName AS userName',
-        'u.userPhoto AS userPhoto',
+        'u.userPhotoURL AS userPhotoURL',
         'u.userIntro AS userIntro',
       ])
       .where('f.userId = :userId', { userId: userId })
@@ -110,7 +110,7 @@ export class FollowService {
         .select([
           'u.userId AS userId',
           'u.userName AS userName',
-          'u.userPhoto AS userPhoto',
+          'u.userPhotoURL AS userPhotoURL',
           'u.userIntro AS userIntro',
         ])
         .where('f.followingId = :userId AND :loginAt <= f.createdAt', {

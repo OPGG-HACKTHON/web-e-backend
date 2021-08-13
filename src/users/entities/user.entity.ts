@@ -72,9 +72,19 @@ export class User {
   userEmail: string;
 
   @IsString()
-  @ApiProperty({ type: String, description: '사용자프로필' })
+  @ApiProperty({ type: String, description: '사용자프로필URL' })
   @Column({ nullable: true })
-  userPhoto: string;
+  userPhotoURL: string;
+
+  @IsString()
+  @ApiProperty({ type: String, description: '사용자커버 URL' })
+  @Column({ nullable: true })
+  userCoverURL: string;
+
+  @IsString()
+  @ApiProperty({ type: String, description: '커버 색깔' })
+  @Column({ nullable: true })
+  userColor: string;
 
   @IsString()
   @IsEnum(GameFeed)
