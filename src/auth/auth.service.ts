@@ -42,7 +42,9 @@ export class AuthService {
     const payload = {
       userId: user.userId,
       userEmail: user.userEmail,
-      userPhoto: user.userPhoto,
+      userPhotoURL: user.userPhotoURL,
+      userCoverURL: user.userCoverURL,
+      userColor: user.userColor,
       userIntro: user.userIntro,
       userFeed: user.userFeed,
       lolTier: user.lolTier,

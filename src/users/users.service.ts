@@ -27,10 +27,7 @@ export class UsersService {
       throw new HttpException('사용자가 존재하지 않습니다.', 404); //throw는 return 기능까지 수행한다.
     }
 
-    return await this.usersRepository.findOne(
-      { userId: userId },
-      //{ select: ['userId', 'userPassword', 'userPhoto', 'userEmail'] }, << select option
-    );
+    return await this.usersRepository.findOne({ userId: userId });
   }
   // login정보 확인 logic
   async checkLoginData(loginData: LoginUserDto): Promise<boolean> {
