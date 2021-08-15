@@ -115,19 +115,13 @@ export class VideosController {
     return await this.videosService.findOne(id);
   }
 
-  /* Modify later
-  @UsePipes(
-    new ValidationPipe({
-      forbidNonWhitelisted: false,
-    }),
-  )
   @Patch(':id')
   @ApiOperation({ summary: '동영상 수정' })
   @ApiOkResponse({ description: '수정 완료' })
   @ApiUnauthorizedResponse({ description: '권한이 없음' })
   @ApiBadRequestResponse({ description: '잘못된 입력' })
   @ApiNotFoundResponse({ description: '해당 동영상 없음' })
-  @UseGuards(JwtAuthGuard) 
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')
   @ApiBody({ type: UpdateVideoDto })
   @ApiConsumes('multipart/form-data')
@@ -135,7 +129,7 @@ export class VideosController {
     FileInterceptor('video', {
       storage: multerS3({
         s3: s3,
-        bucket: config().awsS3BucketName,
+        bucket: `${config().awsS3BucketName}/videos`,
         acl: 'public-read',
         contentType: multerS3.AUTO_CONTENT_TYPE,
         key: function (req, file, cb) {
@@ -147,17 +141,10 @@ export class VideosController {
   async update(
     @Param('id') id: number,
     @Body() updateVideoDto: UpdateVideoDto,
-    @UploadedFile() file?,
+    @UploadedFile() file,
   ): Promise<void> {
-    console.log(updateVideoDto);
-    console.log(file);
-    return await this.videosService.update(
-      id,
-      updateVideoDto,
-      file ? file.location : undefined,
-    );
+    return await this.videosService.update(id, updateVideoDto, file.location);
   }
-  */
 
   @Delete(':id')
   @ApiOperation({ summary: '동영상 삭제' })
