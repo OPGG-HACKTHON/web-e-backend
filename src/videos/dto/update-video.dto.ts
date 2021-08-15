@@ -1,30 +1,47 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString, IsEnum } from 'class-validator';
+import { ApiPropertyOptional, OmitType, PartialType } from '@nestjs/swagger';
+import {
+  IsString,
+  IsEnum,
+  IsEmpty,
+  IsNotEmpty,
+  IsOptional,
+  ValidateIf,
+} from 'class-validator';
 import { Game } from '../enums/game';
+import { CreateVideoDto } from './create-video.dto';
+
+export class UpdateVideoDto extends PartialType(
+  OmitType(CreateVideoDto, ['userId'] as const),
+) {}
+
+/* Modify later
+function CustomValidateIf () {
+  return ValidateIf((o) => o !== '' && o !== null && o !== undefined)
+}
 
 export class UpdateVideoDto {
+  @CustomValidateIf()
   @IsString()
-  @IsOptional()
-  @ApiProperty({ type: String, description: '사용자 ID' })
-  readonly userId: string;
+  @ApiPropertyOptional({ type: String, description: '제목' })
+  readonly describe: string;
 
-  @IsString()
-  @IsOptional()
-  @ApiProperty({ type: String, description: '동영상 이름' })
-  readonly name: string;
-
+  @ValidateIf((o) => o !== '' && o !== null && o !== undefined)
   @IsEnum(Game)
-  @IsOptional()
-  @ApiProperty({ type: Number, description: '동영상 게임' })
-  readonly game: number;
+  @ApiPropertyOptional({ type: String, description: '게임 카테고리' })
+  readonly category: string;
 
+  @ValidateIf((o) => o !== '' && o !== null && o !== undefined)
   @IsString()
-  @IsOptional()
-  @ApiProperty({ type: String, description: '동영상 url' })
-  readonly url: string;
-
-  @IsString()
-  @IsOptional()
-  @ApiProperty({ type: String, description: '동영상 설명' })
+  @ApiPropertyOptional({ type: String, description: '설명' })
   readonly description: string;
+
+  @ValidateIf((o) => o !== {} && o !== null && o !== undefined)
+  @ApiPropertyOptional({
+    type: 'file',
+    name: 'video',
+    format: 'binary',
+    description: '파일',
+  })
+  readonly file: any;
 }
+*/
