@@ -64,7 +64,7 @@ export class VideosController {
     FileInterceptor('video', {
       storage: multerS3({
         s3: s3,
-        bucket: config().awsS3BucketName,
+        bucket: `${config().awsS3BucketName}/videos`,
         acl: 'public-read',
         contentType: multerS3.AUTO_CONTENT_TYPE,
         key: function (req, file, cb) {
