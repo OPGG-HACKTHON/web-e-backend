@@ -5,10 +5,13 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  OneToMany,
 } from 'typeorm';
 import { IsDate, IsEnum, IsNumber, IsString } from 'class-validator';
 import { User } from 'src/users/entities/user.entity';
 import { Game } from '../enums/game';
+import { ApiProperty } from '@nestjs/swagger';
+import { VideoLike } from 'src/video-like/entities/video-like.entity';
 
 @Entity()
 export class Video {
@@ -54,4 +57,8 @@ export class Video {
   @IsNumber()
   @Column({ type: 'int', default: 0 })
   likes: number;
+
+  @ApiProperty({ type: VideoLike, description: '비디오 좋아요 당하는 비디오' })
+  @OneToMany(() => VideoLike, (videoLike) => videoLike.likedVideo)
+  likedVideo: VideoLike[];
 }

@@ -8,4 +8,5 @@ export class UpdateUserDto extends OmitType(User, [
   'following',
   'user',
   'videos',
+  'followerCount',
 ]) {}

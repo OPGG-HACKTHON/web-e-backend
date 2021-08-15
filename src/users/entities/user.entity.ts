@@ -1,9 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsEnum, IsString } from 'class-validator';
+import { IsEmail, IsEnum, IsNumber, IsString } from 'class-validator';
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 import { Video } from 'src/videos/entities/video.entity';
 import { Follow } from 'src/follow/entities/follow.entity';
 import { timestamp } from 'rxjs';
+import { VideoLike } from 'src/video-like/entities/video-like.entity';
 //사용자 권한
 export enum Role {
   ADMIN = 'ADMIN',
@@ -121,6 +122,11 @@ export class User {
   @Column({ type: 'enum', enum: Role, default: Role.USER })
   userRole: Role;
 
+  @IsNumber()
+  @ApiProperty({ type: Number, description: '팔로워 수' })
+  @Column({ default: 0 })
+  followerCount: number;
+
   @ApiProperty({ type: timestamp, description: '최근 로그인 시간' })
   @Column({
     nullable: false,
@@ -138,7 +144,15 @@ export class User {
   @OneToMany(() => Follow, (follow) => follow.user)
   user: Follow[];
 
-  @ApiProperty({ type: Video, description: '팔로우 당하는 사용자' })
+  @ApiProperty({ type: Follow, description: '팔로우 당하는 사용자' })
   @OneToMany(() => Follow, (follow) => follow.following)
   following: Follow[];
+
+  @ApiProperty({ type: VideoLike, description: '비디오 좋아요 누르는 사용자' })
+  @OneToMany(() => VideoLike, (videoLike) => videoLike.likeUser)
+  likeUser: VideoLike[];
+
+  @ApiProperty({ type: VideoLike, description: '비디오 좋아요 당하는 사용자' })
+  @OneToMany(() => VideoLike, (videoLike) => videoLike.likedUser)
+  likedUser: VideoLike[];
 }

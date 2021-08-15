@@ -30,6 +30,10 @@ export class FollowService {
         userId: user.userId,
         followingId: following.userId,
       });
+
+      user.followerCount = user.followerCount + 1;
+      await this.userRepository.save(user);
+
       return {
         statusCode: 201,
         message: '팔로잉 성공',
@@ -85,16 +89,22 @@ export class FollowService {
   }
   //unfollow logic
   async unfollow(followData: CreateFollowDto) {
+    const user = await this.userRepository.findOne({
+      userId: followData.userId,
+    });
     const validFollow = await this.followRepository.findOne({
       userId: followData.userId,
       followingId: followData.followingId,
     });
     if (!validFollow) throw new HttpException('팔로우 중이 아닙니다', 404);
     else {
-      return await this.followRepository.delete({
+      await this.followRepository.delete({
         userId: validFollow.userId,
         followingId: validFollow.followingId,
       });
+
+      user.followerCount = user.followerCount - 1;
+      return await this.userRepository.save(user);
     }
   }
   //get new Followers
@@ -119,5 +129,14 @@ export class FollowService {
         })
         .getRawMany();
     }
+  }
+  //유효한 follow인지 확인
+  async isFollow(followData: CreateFollowDto) {
+    const validFollow = await this.followRepository.findOne({
+      userId: followData.userId,
+      followingId: followData.followingId,
+    });
+    if (validFollow) return true;
+    else return false;
   }
 }
