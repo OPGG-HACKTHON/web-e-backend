@@ -88,27 +88,43 @@ export class User {
 
   @IsString()
   @IsEnum(GameFeed)
-  @ApiProperty({ type: String, description: '사용자 게임 Default 피드' })
+  @ApiProperty({
+    type: String,
+    description: '사용자 게임 Default 피드',
+    default: GameFeed.LOL,
+  })
   @Column({ type: 'enum', enum: GameFeed, default: GameFeed.LOL })
-  userFeed: string;
+  userFeed: GameFeed;
 
   @IsString()
   @IsEnum(LOLTier)
-  @ApiProperty({ type: String, description: 'league of legend(ll) 티어' })
+  @ApiProperty({
+    type: String,
+    description: 'league of legend(ll) 티어',
+    default: LOLTier.UNRANKED,
+  })
   @Column({ type: 'enum', enum: LOLTier, default: LOLTier.UNRANKED })
-  lolTier: string;
+  lolTier: LOLTier;
 
   @IsString()
   @IsEnum(PUBGTier)
-  @ApiProperty({ type: String, description: 'battle ground(bg) 티어' })
+  @ApiProperty({
+    type: String,
+    description: 'battle ground(bg) 티어',
+    default: PUBGTier.UNRANKED,
+  })
   @Column({ type: 'enum', enum: PUBGTier, default: PUBGTier.UNRANKED })
-  pubgTier: string;
+  pubgTier: PUBGTier;
 
   @IsString()
   @IsEnum(WatchTier)
-  @ApiProperty({ type: String, description: 'overwatch(ow) 티어' })
+  @ApiProperty({
+    type: String,
+    description: 'overwatch(ow) 티어',
+    default: WatchTier.UNRANKED,
+  })
   @Column({ type: 'enum', enum: WatchTier, default: WatchTier.UNRANKED })
-  watchTier: string;
+  watchTier: WatchTier;
 
   @IsString()
   @ApiProperty({ type: String, description: '사용자 소개' })
