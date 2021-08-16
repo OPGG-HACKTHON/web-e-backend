@@ -42,6 +42,8 @@ export class UsersController {
   @ApiCreatedResponse({ description: '회원가입 완료' })
   @ApiResponse({ status: 400, description: '입력값 오류' })
   @ApiResponse({ status: 403, description: '아이디 중복 오류' })
+  @ApiResponse({ status: 405, description: '이름(userName) 중복 오류' })
+  @ApiResponse({ status: 406, description: '비밀번호 불일치' })
   @ApiBody({ type: CreateUserDto })
   async register(@Body() userData: CreateUserDto) {
     try {
