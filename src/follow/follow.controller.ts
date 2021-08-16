@@ -67,7 +67,7 @@ export class FollowController {
   })
   @ApiResponse({ status: 200, description: '팔로워 목록' })
   @ApiResponse({ status: 404, description: '사용자 없음' })
-  @Get(':userId//follower')
+  @Get(':userId/follower')
   async getMyFollowers(@Param('userId') userId: string) {
     try {
       const followers = await this.followService.getMyFollowers(userId);

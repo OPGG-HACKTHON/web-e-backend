@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 import { timestamp } from 'rxjs';
 import { User } from 'src/users/entities/user.entity';
 import { Video } from 'src/videos/entities/video.entity';
@@ -17,10 +17,10 @@ export class VideoLike {
   @PrimaryColumn({ name: 'likeId' })
   likeId: string;
 
-  @IsString()
+  @IsNumber()
   @ApiProperty({ type: Video, description: '좋아요 받는 비디오' })
   @PrimaryColumn({ name: 'videoId' })
-  videoId: string;
+  videoId: number;
 
   @ManyToOne(() => User, (user) => user.likeUser)
   @JoinColumn({ name: 'userId' })

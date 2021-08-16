@@ -19,7 +19,7 @@ export class Video {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne((type) => User, (user) => user.videos)
+  @ManyToOne(() => User, (user) => user.videos)
   user: User;
 
   @IsDate()
