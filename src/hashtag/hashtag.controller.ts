@@ -1,34 +1,28 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { HashtagService } from './hashtag.service';
-import { CreateHashtagDto } from './dto/create-hashtag.dto';
-import { UpdateHashtagDto } from './dto/update-hashtag.dto';
+import {
+  ApiBadRequestResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 
+@ApiTags('해시태그(Hashtag)')
 @Controller('hashtag')
 export class HashtagController {
   constructor(private readonly hashtagService: HashtagService) {}
 
-  @Post()
-  create(@Body() createHashtagDto: CreateHashtagDto) {
-    return this.hashtagService.create(createHashtagDto);
-  }
-
   @Get()
-  findAll() {
-    return this.hashtagService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.hashtagService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateHashtagDto: UpdateHashtagDto) {
-    return this.hashtagService.update(+id, updateHashtagDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.hashtagService.remove(+id);
+  @ApiOperation({ summary: '해시태그 검색' })
+  @ApiOkResponse({ description: '검색 완료' })
+  @ApiBadRequestResponse({ description: '잘못된 입력' })
+  @ApiQuery({
+    name: 'category',
+    required: false,
+    description: '게임 카테고리',
+  })
+  async findAll(@Query() query) {
+    return await this.hashtagService.findAll();
   }
 }
