@@ -34,14 +34,24 @@ export class HashtagService {
 
   async increaseCnt(hashtag: string): Promise<void> {
     const hashtagToUpdate = await this.hashtagRepository.findOne(hashtag);
-    if (!hashtagToUpdate) throw new HttpException('', 404);
+    if (!hashtagToUpdate)
+      throw new HttpException(`Hashtag ${hashtag} is none.`, 404);
     hashtagToUpdate.cnt++;
+    await this.hashtagRepository.save(hashtagToUpdate);
+  }
+
+  async decreaseCnt(hashtag: string): Promise<void> {
+    const hashtagToUpdate = await this.hashtagRepository.findOne(hashtag);
+    if (!hashtagToUpdate)
+      throw new HttpException(`Hashtag ${hashtag} is none.`, 404);
+    if (hashtagToUpdate.cnt > 0) hashtagToUpdate.cnt--;
     await this.hashtagRepository.save(hashtagToUpdate);
   }
 
   async remove(hashtag: string): Promise<void> {
     const hashtagToDelete = await this.hashtagRepository.findOne(hashtag);
-    if (!hashtagToDelete) throw new HttpException('', 404);
+    if (!hashtagToDelete)
+      throw new HttpException(`Hashtag ${hashtag} is none.`, 404);
     await this.hashtagRepository.delete(hashtag);
   }
 }
