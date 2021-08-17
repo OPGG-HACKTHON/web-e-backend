@@ -40,7 +40,7 @@ export class HashtagService {
   }
 
   async remove(hashtag: string): Promise<void> {
-    const hashtagToDelete = this.hashtagRepository.findOne(hashtag);
+    const hashtagToDelete = await this.hashtagRepository.findOne(hashtag);
     if (!hashtagToDelete) throw new HttpException('', 404);
     await this.hashtagRepository.delete(hashtag);
   }
