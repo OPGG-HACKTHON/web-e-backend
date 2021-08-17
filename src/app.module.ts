@@ -11,6 +11,7 @@ import { Follow } from './follow/entities/follow.entity';
 import { VideosModule } from './videos/videos.module';
 import { ImageModule } from './image/image.module';
 import { FollowModule } from './follow/follow.module';
+import { HashtagModule } from './hashtag/hashtag.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { FollowModule } from './follow/follow.module';
     VideosModule,
     ImageModule,
     FollowModule,
+    HashtagModule,
   ],
   controllers: [AppController],
   providers: [],
