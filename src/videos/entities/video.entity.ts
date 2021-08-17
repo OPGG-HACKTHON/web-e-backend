@@ -6,11 +6,13 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { IsDate, IsEnum, IsNumber, IsString } from 'class-validator';
 import { User } from 'src/users/entities/user.entity';
 import { Game } from '../enums/game';
 import { ApiProperty } from '@nestjs/swagger';
+import { VideoHashtag } from 'src/hashtag/entities/video-hashtag.entity';
 
 @Entity()
 export class Video {
@@ -59,6 +61,10 @@ export class Video {
   @ApiProperty({ type: String, description: '설명' })
   @Column({ type: 'varchar', default: '' })
   description: string;
+
+  @ApiProperty()
+  @OneToMany(() => VideoHashtag, (hashtag) => hashtag.video)
+  hashtags: VideoHashtag[];
 
   @IsNumber()
   @ApiProperty({ type: Number, description: '좋아요' })
