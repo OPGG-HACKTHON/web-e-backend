@@ -12,6 +12,8 @@ import { VideosModule } from './videos/videos.module';
 import { ImageModule } from './image/image.module';
 import { FollowModule } from './follow/follow.module';
 import { HashtagModule } from './hashtag/hashtag.module';
+import { Hashtag } from './hashtag/entities/hashtag.entity';
+import { VideoHashtag } from './hashtag/entities/video-hashtag.entity';
 
 @Module({
   imports: [
@@ -30,7 +32,7 @@ import { HashtagModule } from './hashtag/hashtag.module';
         username: configService.get('database.user'),
         password: configService.get('database.password'),
         database: configService.get('database.name'),
-        entities: [User, Video, Follow],
+        entities: [User, Video, Follow, Hashtag, VideoHashtag],
         synchronize: true,
       }),
     }),

@@ -7,6 +7,7 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
+import { Hashtag } from './entities/hashtag.entity';
 
 @ApiTags('해시태그(Hashtag)')
 @Controller('hashtag')
@@ -22,7 +23,7 @@ export class HashtagController {
     required: false,
     description: '게임 카테고리',
   })
-  async findAll(@Query() query) {
-    return await this.hashtagService.findAll();
+  async findAll(@Query() query): Promise<Hashtag[]> {
+    return await this.hashtagService.findAll(query.category);
   }
 }

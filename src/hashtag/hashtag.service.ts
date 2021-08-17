@@ -1,26 +1,47 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateHashtagDto } from './dto/create-hashtag.dto';
-import { UpdateHashtagDto } from './dto/update-hashtag.dto';
+import { Hashtag } from './entities/hashtag.entity';
 
 @Injectable()
 export class HashtagService {
-  create(createHashtagDto: CreateHashtagDto) {
-    return 'This action adds a new hashtag';
+  constructor(
+    @InjectRepository(Hashtag)
+    private readonly hashtagRepository: Repository<Hashtag>,
+  ) {}
+
+  async create(createHashtagDto: CreateHashtagDto): Promise<Hashtag> {
+    const hashtag = await this.hashtagRepository.create();
+    hashtag.category = createHashtagDto.category;
+    hashtag.hashtag = createHashtagDto.hashtag;
+    return await this.hashtagRepository.save(hashtag);
   }
 
-  findAll() {
-    return `This action returns all hashtag`;
+  async findAll(category: string): Promise<Hashtag[]> {
+    const conditions = {};
+    if (category) conditions['category'] = category;
+    const ret = await this.hashtagRepository.find({
+      where: conditions,
+    });
+    return ret;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} hashtag`;
+  async findOne(hashtag: string): Promise<Hashtag> {
+    const ret = await this.hashtagRepository.findOneOrFail(hashtag);
+    return ret;
   }
 
-  update(id: number, updateHashtagDto: UpdateHashtagDto) {
-    return `This action updates a #${id} hashtag`;
+  async increaseCnt(hashtag: string): Promise<void> {
+    const hashtagToUpdate = await this.hashtagRepository.findOne(hashtag);
+    if (!hashtagToUpdate) throw new HttpException('', 404);
+    hashtagToUpdate.cnt++;
+    await this.hashtagRepository.save(hashtagToUpdate);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} hashtag`;
+  async remove(hashtag: string): Promise<void> {
+    const hashtagToDelete = this.hashtagRepository.findOne(hashtag);
+    if (!hashtagToDelete) throw new HttpException('', 404);
+    await this.hashtagRepository.delete(hashtag);
   }
 }
