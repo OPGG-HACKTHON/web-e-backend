@@ -63,10 +63,6 @@ export class UsersService {
       //1. interceptor 2. Exception filter
     }
 
-    if (!userData.userEmail) {
-      throw new HttpException('이메일이 없습니다.', 400);
-    }
-
     if (!userData.userPassword) {
       throw new HttpException('비밀번호가 없습니다.', 400);
     }
@@ -91,7 +87,6 @@ export class UsersService {
       userId: userData.userId,
       userName: userData.userName,
       userPassword: hashedPassword,
-      userEmail: userData.userEmail,
     });
   }
   // 회원 삭제 logic

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsEnum, IsString } from 'class-validator';
+import { IsEnum, IsString } from 'class-validator';
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 import { Video } from 'src/videos/entities/video.entity';
 import { Follow } from 'src/follow/entities/follow.entity';
@@ -65,11 +65,6 @@ export class User {
   @ApiProperty({ type: String, description: '사용자 비밀번호' })
   @Column()
   userPassword: string;
-
-  @IsEmail()
-  @ApiProperty({ example: 'watpl@gmail.com', description: '사용자 이메일' })
-  @Column()
-  userEmail: string;
 
   @IsString()
   @ApiProperty({ type: String, description: '사용자프로필URL' })
