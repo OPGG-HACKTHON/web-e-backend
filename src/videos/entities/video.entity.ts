@@ -5,12 +5,14 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  OneToMany,
   JoinColumn,
 } from 'typeorm';
 import { IsDate, IsEnum, IsNumber, IsString } from 'class-validator';
 import { User } from 'src/users/entities/user.entity';
 import { Game } from '../enums/game';
 import { ApiProperty } from '@nestjs/swagger';
+import { VideoLike } from 'src/video-like/entities/video-like.entity';
 
 @Entity()
 export class Video {
@@ -18,6 +20,9 @@ export class Video {
   @ApiProperty({ type: Number, description: 'ID' })
   @PrimaryGeneratedColumn()
   id: number;
+
+  @ManyToOne(() => User, (user) => user.videos)
+  user: User;
 
   @IsDate()
   @ApiProperty({ type: Date, description: '업로드 날짜' })
@@ -69,4 +74,8 @@ export class Video {
   @ApiProperty({ type: Number, description: '댓글' })
   @Column({ type: 'int', default: 0 })
   comments: number;
+
+  @ApiProperty({ type: VideoLike, description: '비디오 좋아요 당하는 비디오' })
+  @OneToMany(() => VideoLike, (videoLike) => videoLike.likedVideo)
+  likedVideo: VideoLike[];
 }

@@ -11,6 +11,8 @@ import { Follow } from './follow/entities/follow.entity';
 import { VideosModule } from './videos/videos.module';
 import { ImageModule } from './image/image.module';
 import { FollowModule } from './follow/follow.module';
+import { VideoLikeModule } from './video-like/video-like.module';
+import { VideoLike } from './video-like/entities/video-like.entity';
 
 @Module({
   imports: [
@@ -29,8 +31,8 @@ import { FollowModule } from './follow/follow.module';
         username: configService.get('database.user'),
         password: configService.get('database.password'),
         database: configService.get('database.name'),
-        entities: [User, Video, Follow],
-        synchronize: true,
+        entities: [User, Video, Follow, VideoLike],
+        synchronize: false,
       }),
     }),
     UsersModule,
@@ -39,6 +41,7 @@ import { FollowModule } from './follow/follow.module';
     VideosModule,
     ImageModule,
     FollowModule,
+    VideoLikeModule,
   ],
   controllers: [AppController],
   providers: [],

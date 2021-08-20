@@ -59,8 +59,6 @@ export class UsersService {
   async register(userData: CreateUserDto) {
     if (!userData.userId) {
       throw new HttpException('아이디가 없습니다.', 400);
-      //에러를 뿜었을 때 catch 해줄 수 있는 존재가 필요함.
-      //1. interceptor 2. Exception filter
     }
 
     if (!userData.userPassword) {
@@ -74,8 +72,17 @@ export class UsersService {
     const user = await this.usersRepository.findOne({
       userId: userData.userId,
     });
+
+    const userName = await this.usersRepository.findOne({
+      userName: userData.userName,
+    });
+
     if (user) {
       throw new HttpException('아이디 중복', 403); //throw는 return 기능까지 수행한다.
+    }
+
+    if (userName) {
+      throw new HttpException('유저 네임(UserName) 중복', 405); //throw는 return 기능까지 수행한다.
     }
 
     const hashedPassword = await bcrypt.hash(
@@ -95,7 +102,7 @@ export class UsersService {
     if (isMatch) {
       return await this.usersRepository.delete({ userId: deleteData.userId });
     } else {
-      throw new HttpException('비밀번호 불일치 (삭제불가)', 400);
+      throw new HttpException('비밀번호 불일치 (삭제불가)', 406);
     }
   }
   // 회원 정보 갱신 logic
