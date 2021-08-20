@@ -41,7 +41,6 @@ export class AuthService {
 
     const payload = {
       userId: user.userId,
-      userEmail: user.userEmail,
       userPhotoURL: user.userPhotoURL,
       userCoverURL: user.userCoverURL,
       userColor: user.userColor,

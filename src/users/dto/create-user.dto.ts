@@ -4,5 +4,8 @@ export class CreateUserDto extends PickType(User, [
   'userId',
   'userName',
   'userPassword',
-  'userEmail',
+  'userFeed',
+  'lolTier',
+  'pubgTier',
+  'watchTier',
 ] as const) {}

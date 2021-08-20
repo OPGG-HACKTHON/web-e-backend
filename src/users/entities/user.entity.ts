@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsEnum, IsNumber, IsString } from 'class-validator';
+import { IsEnum, IsNumber, IsString } from 'class-validator';
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 import { Video } from 'src/videos/entities/video.entity';
 import { Follow } from 'src/follow/entities/follow.entity';
@@ -67,11 +67,6 @@ export class User {
   @Column()
   userPassword: string;
 
-  @IsEmail()
-  @ApiProperty({ example: 'watpl@gmail.com', description: '사용자 이메일' })
-  @Column()
-  userEmail: string;
-
   @IsString()
   @ApiProperty({ type: String, description: '사용자프로필URL' })
   @Column({ nullable: true })
@@ -89,27 +84,43 @@ export class User {
 
   @IsString()
   @IsEnum(GameFeed)
-  @ApiProperty({ type: String, description: '사용자 게임 Default 피드' })
+  @ApiProperty({
+    type: String,
+    description: '사용자 게임 Default 피드',
+    default: GameFeed.LOL,
+  })
   @Column({ type: 'enum', enum: GameFeed, default: GameFeed.LOL })
-  userFeed: string;
+  userFeed: GameFeed;
 
   @IsString()
   @IsEnum(LOLTier)
-  @ApiProperty({ type: String, description: 'league of legend(ll) 티어' })
+  @ApiProperty({
+    type: String,
+    description: 'league of legend(ll) 티어',
+    default: LOLTier.UNRANKED,
+  })
   @Column({ type: 'enum', enum: LOLTier, default: LOLTier.UNRANKED })
-  lolTier: string;
+  lolTier: LOLTier;
 
   @IsString()
   @IsEnum(PUBGTier)
-  @ApiProperty({ type: String, description: 'battle ground(bg) 티어' })
+  @ApiProperty({
+    type: String,
+    description: 'battle ground(bg) 티어',
+    default: PUBGTier.UNRANKED,
+  })
   @Column({ type: 'enum', enum: PUBGTier, default: PUBGTier.UNRANKED })
-  pubgTier: string;
+  pubgTier: PUBGTier;
 
   @IsString()
   @IsEnum(WatchTier)
-  @ApiProperty({ type: String, description: 'overwatch(ow) 티어' })
+  @ApiProperty({
+    type: String,
+    description: 'overwatch(ow) 티어',
+    default: WatchTier.UNRANKED,
+  })
   @Column({ type: 'enum', enum: WatchTier, default: WatchTier.UNRANKED })
-  watchTier: string;
+  watchTier: WatchTier;
 
   @IsString()
   @ApiProperty({ type: String, description: '사용자 소개' })

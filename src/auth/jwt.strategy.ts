@@ -17,7 +17,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     //payload값 return
     return {
       id: payload.userId,
-      email: payload.userEmail,
       photo: payload.userPhotoURL,
       cover: payload.userCoverURL,
       color: payload.userColor,
