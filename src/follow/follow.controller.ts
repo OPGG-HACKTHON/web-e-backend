@@ -87,6 +87,34 @@ export class FollowController {
       );
     }
   }
+
+  @ApiOperation({
+    description: '특정 유저의 새로운 팔로워 목록',
+    summary: '새로운 팔로워 목록',
+  })
+  @ApiResponse({ status: 200, description: '새로운 좋아요 목록' })
+  @ApiResponse({ status: 404, description: '데이터정보 없음' })
+  @Get(':userId/newFollower')
+  async getNewFollower(@Param('userId') userId: string) {
+    try {
+      const followers = await this.followService.getNewFollowers(userId);
+      return {
+        statusCode: 200,
+        message: '새로운 팔로워 리스트',
+        followers: followers,
+        followersCount: followers.length,
+      };
+    } catch (err) {
+      throw new HttpException(
+        {
+          statusCode: err.status,
+          message: err.message,
+        },
+        err.status,
+      );
+    }
+  }
+
   // userId가 팔로잉하는 사용자들 구하기 (userId가 팔로우하는 사람들 가져오기)
   @ApiOperation({
     description: '특정 유저 팔로잉 목록 찾기',

@@ -106,8 +106,11 @@ export class VideoLikeService {
         'u.userId AS userId',
         'u.userName AS userName',
         'u.userPhotoURL AS userPhotoURL',
-        'v.name AS videoName',
-        'v.game AS videoGame',
+        // 'v.describe AS describe',
+        // 'v.description AS description',
+        'v.videoName AS videoName',
+        'v.videoIntro AS videoIntro',
+        'v.category AS category',
         'vl.createdAt AS createdAt',
       ])
       .where('vl.likeId = :userId', { userId: userId })
@@ -128,8 +131,9 @@ export class VideoLikeService {
         'u.userId AS userId',
         'u.userName AS userName',
         'u.userPhotoURL AS userPhotoURL',
-        'v.name AS videoName',
-        'v.game AS videoGame',
+        'v.videoName AS videoName',
+        'v.videoIntro AS videoIntro',
+        'v.category AS category',
         'vl.createdAt AS createdAt',
       ])
       .where('vl.likeId = :userId AND :loginAt <= vl.createdAt', {

@@ -11,7 +11,7 @@ export class CreateVideoDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({ type: String, description: '제목' })
-  readonly describe: string;
+  readonly videoName: string;
 
   @IsEnum(Game)
   @IsNotEmpty()
@@ -20,7 +20,7 @@ export class CreateVideoDto {
 
   @IsString()
   @ApiPropertyOptional({ type: String, description: '설명' })
-  readonly description: string;
+  readonly videoIntro: string;
 
   @IsEmpty()
   @ApiProperty({

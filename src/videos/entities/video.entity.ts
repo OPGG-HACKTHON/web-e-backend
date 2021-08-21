@@ -6,7 +6,6 @@ import {
   UpdateDateColumn,
   ManyToOne,
   OneToMany,
-  JoinColumn,
 } from 'typeorm';
 import { IsDate, IsEnum, IsNumber, IsString } from 'class-validator';
 import { User } from 'src/users/entities/user.entity';
@@ -40,14 +39,10 @@ export class Video {
   @Column({ type: 'int', default: 0 })
   views: number;
 
-  @ManyToOne((type) => User, (user) => user.videos)
-  @JoinColumn()
-  user: User;
-
   @IsString()
   @ApiProperty({ type: String, description: '제목' })
   @Column()
-  describe: string;
+  videoName: string;
 
   // @IsUrl()
   @IsString()
@@ -63,7 +58,7 @@ export class Video {
   @IsString()
   @ApiProperty({ type: String, description: '설명' })
   @Column({ type: 'varchar', default: '' })
-  description: string;
+  videoIntro: string;
 
   @IsNumber()
   @ApiProperty({ type: Number, description: '좋아요' })

@@ -30,11 +30,10 @@ export class VideosService {
     if (!user)
       throw new HttpException(`User with id ${videoUserId} is none.`, 404);
     video.user = user;
-    video.describe = createVideoDto.describe;
+    video.videoName = createVideoDto.videoName;
     video.category = createVideoDto.category;
     video.src = location;
-    if (createVideoDto.description)
-      video.description = createVideoDto.description;
+    if (createVideoDto.videoIntro) video.videoIntro = createVideoDto.videoIntro;
     return await this.videosRepository.save(video);
   }
 
@@ -88,12 +87,12 @@ export class VideosService {
     const videoToUpdate = await this.videosRepository.findOne(id);
     if (!videoToUpdate)
       throw new HttpException(`Video with id ${id} is none.`, 404);
-    if (videoToUpdate.describe)
-      videoToUpdate.describe = updateVideoDto.describe;
+    if (videoToUpdate.videoName)
+      videoToUpdate.videoName = updateVideoDto.videoName;
     if (videoToUpdate.category)
       videoToUpdate.category = updateVideoDto.category;
-      if (updateVideoDto.description)
-      videoToUpdate.description = updateVideoDto.description;
+    if (updateVideoDto.videoIntro)
+      videoToUpdate.videoIntro = updateVideoDto.videoIntro;
     if (location) videoToUpdate.src = location;
     await this.videosRepository.save(videoToUpdate);
   }
