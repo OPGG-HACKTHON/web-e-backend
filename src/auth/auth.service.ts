@@ -32,10 +32,6 @@ export class AuthService {
   }
 
   async login(user: any): Promise<any> {
-    //get followers
-    const followers = await this.followService.getMyFollowers(user.userId);
-    //get new Followers
-    const newFollowers = await this.followService.getNewFollowers(user.userId);
     //update recent loginTime
     const loginAt = await this.usersService.updateLoginAt(user.userId);
 
@@ -55,8 +51,6 @@ export class AuthService {
     return {
       statusCode: 201,
       message: '로그인 성공, 토큰 발행',
-      followers: followers,
-      newFollowers: newFollowers,
       access_token: this.jwtService.sign(payload),
     };
   }

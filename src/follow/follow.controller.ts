@@ -127,10 +127,10 @@ export class FollowController {
     try {
       const following = await this.followService.getMyFollowings(userId);
       return {
-        StatusCode: 200,
+        statusCode: 200,
         message: '팔로잉 유저 리스트',
         followings: following,
-        followingsCounts: following.length,
+        followingsCount: following.length,
       };
     } catch (err) {
       throw new HttpException(
