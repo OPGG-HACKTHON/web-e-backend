@@ -137,60 +137,6 @@ export class VideosController {
     }
   }
 
-  @Get('/all/onLogin/:userId')
-  @ApiOperation({ summary: '로그인 시 동영상 리스트 (임시) 중간보고용' })
-  @ApiOkResponse({ description: '검색 완료' })
-  @ApiUnauthorizedResponse({ description: '권한이 없음' })
-  @ApiBadRequestResponse({ description: '잘못된 입력' })
-  @ApiQuery({
-    name: 'end',
-    description: '끝번호',
-  })
-  @ApiQuery({
-    name: 'start',
-    description: '시작번호',
-  })
-
-  // @ApiQuery({
-  //   name: 'category',
-  //   required: false,
-  //   description: '게임 카테고리',
-  // })
-  // @ApiQuery({
-  //   name: 'hashtag',
-  //   required: false,
-  //   description: '해시태그',
-  // })
-  // async findAll(@Request() req, @Query() query?): Promise<Video[]> {
-  //   return await this.videosService.findAll(
-  //     req.user, // How can I get login user data?
-  //     query.category,
-  //     query.hashtag,
-  //   );
-  // }
-  async findAllOnUserId(@Param('userId') userId, @Query() query) {
-    try {
-      const videoList = await this.videosService.findAllOnUser(
-        userId,
-        query.start,
-        query.end,
-      );
-      return {
-        statusCode: 200,
-        message: '비디오 리스트',
-        datas: videoList,
-      };
-    } catch (err) {
-      throw new HttpException(
-        {
-          statusCode: err.status,
-          message: err.message,
-        },
-        err.status,
-      );
-    }
-  }
-
   @Get('/all')
   @ApiOperation({ summary: '비 로그인 시 동영상 리스트' })
   @ApiOkResponse({ description: '검색 완료' })
