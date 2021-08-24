@@ -166,8 +166,4 @@ export class User {
   @ApiProperty({ type: VideoLike, description: '비디오 좋아요 당하는 사용자' })
   @OneToMany(() => VideoLike, (videoLike) => videoLike.likedUser)
   likedUser: VideoLike[];
-
-  // @ApiProperty({ type: Video, description: '비디오 좋아요 당하는 사용자' })
-  // @OneToMany(() => Video, (video) => video.userId)
-  // videoUser: Video[];
 }

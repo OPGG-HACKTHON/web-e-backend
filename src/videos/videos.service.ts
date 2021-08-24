@@ -64,6 +64,8 @@ export class VideosService {
 
   async findAllOnUser(loginData: any, start: number, end: number) {
     const loginUser = await this.usersRepository.findOne(loginData.id);
+    if (loginUser.userId !== loginData.id)
+      throw new HttpException('권한이 없습니다(로그인 정보 불일치)', 401);
     const videos = await this.videosRepository.find({
       id: Between(start, end),
     });
@@ -76,6 +78,7 @@ export class VideosService {
           video.id,
         );
         const users = await this.usersRepository.findOne(video.userId);
+        if (!users) throw new HttpException('사용자 정보가 없습니다', 404);
         return Object.assign(video, {
           relation: { isFollow: isFollow, isLike: isLike },
           poster: {
@@ -98,6 +101,7 @@ export class VideosService {
 
   async findUserVideos(userId: string): Promise<Video[]> {
     const user = await this.usersRepository.findOne(userId);
+    if (!user) throw new HttpException('사용자 정보가 없습니다', 404);
     const video = await this.videosRepository.find({
       where: { user: user },
     });

@@ -76,11 +76,25 @@ export class VideosController {
     }),
   )
   async create(@Body() createVideoDto: CreateVideoDto, @UploadedFile() file) {
-    const video = await this.videosService.create(
-      createVideoDto,
-      file.location,
-    );
-    return video;
+    try {
+      const video = await this.videosService.create(
+        createVideoDto,
+        file.location,
+      );
+      return {
+        statusCode: 201,
+        message: '비디오 업로드& 정보 등록 완료',
+        datas: video,
+      };
+    } catch (err) {
+      throw new HttpException(
+        {
+          statusCode: err.status,
+          message: err.message,
+        },
+        err.status,
+      );
+    }
   }
 
   @Get('/all/onLogin')
@@ -91,6 +105,7 @@ export class VideosController {
   @ApiOkResponse({ description: '검색 완료' })
   @ApiUnauthorizedResponse({ description: '권한이 없음' })
   @ApiBadRequestResponse({ description: '잘못된 입력' })
+  @ApiResponse({ status: 404, description: '사용자 정보 오류' })
   @ApiQuery({
     name: 'end',
     description: '끝번호',
@@ -228,6 +243,7 @@ export class VideosController {
   @ApiUnauthorizedResponse({ description: '권한이 없음' })
   @ApiBadRequestResponse({ description: '잘못된 입력' })
   @ApiNotFoundResponse({ description: '해당 동영상 없음' })
+  @ApiResponse({ status: 404, description: '사용자 정보 없음' })
   async findUserVideos(@Param('userId') userId: string) {
     try {
       const videoList = await this.videosService.findUserVideos(userId);

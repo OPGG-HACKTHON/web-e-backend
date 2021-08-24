@@ -24,9 +24,6 @@ export class Video {
   @ManyToOne(() => User, (user) => user.videos)
   @JoinColumn({ name: 'userId', referencedColumnName: 'userId' })
   user: User;
-  // @ManyToOne(() => User, (user) => user.videoUser)
-  // @JoinColumn({ name: 'userId' })
-  // userId: User;
 
   @IsDate()
   @ApiProperty({ type: Date, description: '업로드 날짜' })
