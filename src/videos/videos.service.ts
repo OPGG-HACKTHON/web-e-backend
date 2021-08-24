@@ -1,11 +1,12 @@
 import { Injectable, HttpException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 import { Video } from './entities/video.entity';
 import { CreateVideoDto } from './dto/create-video.dto';
 import { UpdateVideoDto } from './dto/update-video.dto';
 import { User } from 'src/users/entities/user.entity';
 import { Follow } from 'src/follow/entities/follow.entity';
+import { VideoLike } from 'src/video-like/entities/video-like.entity';
 
 @Injectable()
 export class VideosService {
@@ -18,6 +19,9 @@ export class VideosService {
 
     @InjectRepository(Follow)
     private readonly followRepository: Repository<Follow>,
+
+    @InjectRepository(VideoLike)
+    private readonly videoLikeRepository: Repository<VideoLike>,
   ) {}
 
   async create(
@@ -30,6 +34,7 @@ export class VideosService {
     if (!user)
       throw new HttpException(`User with id ${videoUserId} is none.`, 404);
     video.user = user;
+    video.userId = videoUserId;
     video.videoName = createVideoDto.videoName;
     video.category = createVideoDto.category;
     video.src = location;
@@ -37,44 +42,65 @@ export class VideosService {
     return await this.videosRepository.save(video);
   }
 
-  async findAll(
-    loginUser: User,
-    category?: string,
-    hashtag?: string,
-  ): Promise<Video[]> {
-    let conditions = {};
-    if (category) conditions['category'] = category;
-    // if (hashtag) conditions['hashtag'] = hashtag;
+  async findAll(start: number, end: number) {
     const videos = await this.videosRepository.find({
-      relations: ['user'],
-      where: conditions,
+      id: Between(start, end),
     });
-    const followingInfos = await this.followRepository.find({
-      userId: loginUser ? loginUser.userId : undefined,
+    const videosData = await Promise.all(
+      videos.map(async (video) => {
+        const users = await this.usersRepository.findOne(video.userId);
+        return Object.assign(video, {
+          relation: { isFollow: false, isLike: false },
+          poster: {
+            name: users.userName,
+            picture: users.userPhotoURL,
+            followNum: users.followerCount,
+          },
+        });
+      }),
+    );
+    return videosData;
+  }
+
+  async findAllOnUser(loginData: any, start: number, end: number) {
+    const loginUser = await this.usersRepository.findOne(loginData.id);
+    const videos = await this.videosRepository.find({
+      id: Between(start, end),
     });
-    const ret = videos.reduce((acc, it) => {
-      const { user, ...rest } = it;
-      acc.push({
-        ...rest,
-        poster: {
-          name: user.userName,
-          picture: user.userPhotoURL,
-          followNum: 0, // Add later
-        },
-        relation: {
-          isFollow: false, // Add later
-          isLike: false, // Add later
-        },
-      });
-      return acc;
-    }, []);
-    return ret;
+    const videosData = await Promise.all(
+      videos.map(async (video) => {
+        const isFollow = await this.isFollow(loginUser.userId, video.userId);
+        const isLike = await this.isLike(
+          loginUser.userId,
+          video.userId,
+          video.id,
+        );
+        const users = await this.usersRepository.findOne(video.userId);
+        return Object.assign(video, {
+          relation: { isFollow: isFollow, isLike: isLike },
+          poster: {
+            name: users.userName,
+            picture: users.userPhotoURL,
+            followNum: users.followerCount,
+          },
+        });
+      }),
+    );
+    return videosData;
   }
 
   async findOne(id: number): Promise<Video> {
     if (isNaN(id)) throw new HttpException('Id must be a nubmer.', 400);
     const video = await this.videosRepository.findOne(id);
     if (!video) throw new HttpException(`Video with id ${id} is none.`, 404);
+    return video;
+  }
+
+  async findUserVideos(userId: string): Promise<Video[]> {
+    const user = await this.usersRepository.findOne(userId);
+    const video = await this.videosRepository.find({
+      where: { user: user },
+    });
     return video;
   }
 
@@ -111,5 +137,29 @@ export class VideosService {
       throw new HttpException(`Video with id ${id} is none.`, 404);
     videoToUpdate.views++;
     await this.videosRepository.save(videoToUpdate);
+  }
+
+  async isFollow(userId: string, followingId: string) {
+    const validFollow = await this.followRepository.findOne({
+      userId: userId,
+      followingId: followingId,
+    });
+    if (validFollow) return true;
+    else return false;
+  }
+
+  //check this videolike data is valid
+  async isLike(
+    userId: string,
+    likeId: string,
+    videoId: number,
+  ): Promise<boolean> {
+    const like = await this.videoLikeRepository.findOne({
+      userId: userId,
+      likeId: likeId,
+      videoId: videoId,
+    });
+    if (like) return true;
+    else return false;
   }
 }
