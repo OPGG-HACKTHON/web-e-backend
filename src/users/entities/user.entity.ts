@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNumber, IsString } from 'class-validator';
+import { IsBoolean, IsEnum, IsNumber, IsString } from 'class-validator';
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 import { Video } from 'src/videos/entities/video.entity';
 import { Follow } from 'src/follow/entities/follow.entity';
@@ -128,6 +128,21 @@ export class User {
   userIntro: string;
 
   @IsString()
+  @ApiProperty({ type: String, description: '롤 아이디' })
+  @Column({ nullable: true })
+  userLolId: string;
+
+  @IsString()
+  @ApiProperty({ type: String, description: '오버워치 아이디' })
+  @Column({ nullable: true })
+  userWatchId: string;
+
+  @IsString()
+  @ApiProperty({ type: String, description: '배그 아이디' })
+  @Column({ nullable: true })
+  userPubgId: string;
+
+  @IsString()
   @IsEnum(Role)
   @ApiProperty({ type: String, description: '관리자 여부' })
   @Column({ type: 'enum', enum: Role, default: Role.USER })
@@ -137,6 +152,11 @@ export class User {
   @ApiProperty({ type: Number, description: '팔로워 수' })
   @Column({ default: 0 })
   followerCount: number;
+
+  @IsBoolean()
+  @ApiProperty({ type: Number, description: '프로 권한' })
+  @Column({ default: false })
+  isPro: boolean;
 
   @ApiProperty({ type: timestamp, description: '최근 로그인 시간' })
   @Column({

@@ -32,7 +32,7 @@ import { VideoLike } from './video-like/entities/video-like.entity';
         password: configService.get('database.password'),
         database: configService.get('database.name'),
         entities: [User, Video, Follow, VideoLike],
-        synchronize: false,
+        synchronize: true,
       }),
     }),
     UsersModule,
