@@ -6,6 +6,7 @@ import {
   UpdateDateColumn,
   ManyToOne,
   OneToMany,
+  JoinColumn,
 } from 'typeorm';
 import { IsDate, IsEnum, IsNumber, IsString } from 'class-validator';
 import { User } from 'src/users/entities/user.entity';
@@ -21,6 +22,7 @@ export class Video {
   id: number;
 
   @ManyToOne(() => User, (user) => user.videos)
+  @JoinColumn({ name: 'userId', referencedColumnName: 'userId' })
   user: User;
 
   @IsDate()
@@ -59,6 +61,11 @@ export class Video {
   @ApiProperty({ type: String, description: '설명' })
   @Column({ type: 'varchar', default: '' })
   videoIntro: string;
+
+  @IsString()
+  @ApiProperty({ type: String, description: '유저아이디' })
+  @Column({ type: 'varchar', default: '' })
+  userId: string;
 
   @IsNumber()
   @ApiProperty({ type: Number, description: '좋아요' })

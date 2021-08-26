@@ -9,4 +9,6 @@ export class UpdateUserDto extends OmitType(User, [
   'user',
   'videos',
   'followerCount',
+  'likeUser',
+  'likedUser',
 ]) {}

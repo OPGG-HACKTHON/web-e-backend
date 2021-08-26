@@ -10,9 +10,8 @@ import {
   Query,
   UseInterceptors,
   UploadedFile,
-  Request,
-  UsePipes,
-  ValidationPipe,
+  HttpException,
+  Req,
 } from '@nestjs/common';
 import { VideosService } from './videos.service';
 import { CreateVideoDto } from './dto/create-video.dto';
@@ -36,6 +35,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import * as multerS3 from 'multer-s3';
 import * as AWS from 'aws-sdk';
 import config from 'src/config/configuration';
+import { userRole } from 'src/auth/role.decorator';
+import { Role } from 'src/users/entities/user.entity';
+import { RoleGuard } from 'src/auth/role.guard';
 
 const s3 = new AWS.S3({
   accessKeyId: config().awsAccessKeyId,
@@ -74,34 +76,120 @@ export class VideosController {
     }),
   )
   async create(@Body() createVideoDto: CreateVideoDto, @UploadedFile() file) {
-    const video = await this.videosService.create(
-      createVideoDto,
-      file.location,
-    );
-    return video;
+    try {
+      const video = await this.videosService.create(
+        createVideoDto,
+        file.location,
+      );
+      return {
+        statusCode: 201,
+        message: '비디오 업로드& 정보 등록 완료',
+        datas: video,
+      };
+    } catch (err) {
+      throw new HttpException(
+        {
+          statusCode: err.status,
+          message: err.message,
+        },
+        err.status,
+      );
+    }
   }
 
-  @Get()
-  @ApiOperation({ summary: '동영상 리스트' })
+  @Get('/all/onLogin')
+  @ApiBearerAuth('access-token')
+  @userRole(Role.USER)
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @ApiOperation({ summary: '로그인 시 동영상 리스트' })
+  @ApiOkResponse({ description: '검색 완료' })
+  @ApiUnauthorizedResponse({ description: '권한이 없음' })
+  @ApiBadRequestResponse({ description: '잘못된 입력' })
+  @ApiResponse({ status: 404, description: '사용자 정보 오류' })
+  @ApiQuery({
+    name: 'end',
+    description: '끝번호',
+  })
+  @ApiQuery({
+    name: 'start',
+    description: '시작번호',
+  })
+  async findAllOnUser(@Req() req, @Query() query) {
+    try {
+      const videoList = await this.videosService.findAllOnUser(
+        req.user,
+        query.start,
+        query.end,
+      );
+      return {
+        statusCode: 200,
+        message: '비디오 리스트',
+        datas: videoList,
+      };
+    } catch (err) {
+      throw new HttpException(
+        {
+          statusCode: err.status,
+          message: err.message,
+        },
+        err.status,
+      );
+    }
+  }
+
+  @Get('/all')
+  @ApiOperation({ summary: '비 로그인 시 동영상 리스트' })
   @ApiOkResponse({ description: '검색 완료' })
   @ApiUnauthorizedResponse({ description: '권한이 없음' })
   @ApiBadRequestResponse({ description: '잘못된 입력' })
   @ApiQuery({
-    name: 'category',
-    required: false,
-    description: '게임 카테고리',
+    name: 'end',
+    description: '끝번호',
   })
   @ApiQuery({
-    name: 'hashtag',
-    required: false,
-    description: '해시태그',
+    name: 'start',
+    description: '시작번호',
   })
-  async findAll(@Request() req, @Query() query?): Promise<Video[]> {
-    return await this.videosService.findAll(
-      req.user, // How can I get login user data?
-      query.category,
-      query.hashtag,
-    );
+  async findAll(@Query() query) {
+    try {
+      const videoList = await this.videosService.findAll(
+        query.start,
+        query.end,
+      );
+      return {
+        statusCode: 200,
+        message: '비디오 리스트',
+        datas: videoList,
+      };
+    } catch (err) {
+      throw new HttpException(
+        {
+          statusCode: err.status,
+          message: err.message,
+        },
+        err.status,
+      );
+    }
+  }
+
+  @Get('/all/middle')
+  @ApiOperation({ summary: '비 로그인 시 동영상 리스트' })
+  @ApiOkResponse({ description: '검색 완료' })
+  @ApiUnauthorizedResponse({ description: '권한이 없음' })
+  @ApiBadRequestResponse({ description: '잘못된 입력' })
+  async findAllMiddle() {
+    try {
+      const videoList = await this.videosService.findAll(1, 200);
+      return videoList;
+    } catch (err) {
+      throw new HttpException(
+        {
+          statusCode: err.status,
+          message: err.message,
+        },
+        err.status,
+      );
+    }
   }
 
   @Get(':id')
@@ -113,6 +201,32 @@ export class VideosController {
   async findOne(@Param('id') id: number): Promise<Video> {
     await this.videosService.increaseViews(id);
     return await this.videosService.findOne(id);
+  }
+
+  @Get('/user/:userId')
+  @ApiOperation({ summary: '특정 사용자 동영상들 검색' })
+  @ApiOkResponse({ description: '검색 완료' })
+  @ApiUnauthorizedResponse({ description: '권한이 없음' })
+  @ApiBadRequestResponse({ description: '잘못된 입력' })
+  @ApiNotFoundResponse({ description: '해당 동영상 없음' })
+  @ApiResponse({ status: 404, description: '사용자 정보 없음' })
+  async findUserVideos(@Param('userId') userId: string) {
+    try {
+      const videoList = await this.videosService.findUserVideos(userId);
+      return {
+        statusCode: 200,
+        message: '비디오 리스트',
+        datas: videoList,
+      };
+    } catch (err) {
+      throw new HttpException(
+        {
+          statusCode: err.status,
+          message: err.message,
+        },
+        err.status,
+      );
+    }
   }
 
   @Patch(':id')

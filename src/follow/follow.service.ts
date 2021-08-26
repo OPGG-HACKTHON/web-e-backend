@@ -31,8 +31,8 @@ export class FollowService {
         followingId: following.userId,
       });
 
-      user.followerCount = user.followerCount + 1;
-      await this.userRepository.save(user);
+      following.followerCount = following.followerCount + 1;
+      await this.userRepository.save(following);
 
       return {
         statusCode: 201,
@@ -90,7 +90,7 @@ export class FollowService {
   //unfollow logic
   async unfollow(followData: CreateFollowDto) {
     const user = await this.userRepository.findOne({
-      userId: followData.userId,
+      userId: followData.followingId,
     });
     const validFollow = await this.followRepository.findOne({
       userId: followData.userId,
@@ -129,14 +129,5 @@ export class FollowService {
         })
         .getRawMany();
     }
-  }
-  //유효한 follow인지 확인
-  async isFollow(followData: CreateFollowDto) {
-    const validFollow = await this.followRepository.findOne({
-      userId: followData.userId,
-      followingId: followData.followingId,
-    });
-    if (validFollow) return true;
-    else return false;
   }
 }
