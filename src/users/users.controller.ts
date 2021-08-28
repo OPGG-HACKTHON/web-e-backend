@@ -105,6 +105,7 @@ export class UsersController {
         {
           statusCode: err.status,
           message: err.message,
+          data: deleteData,
         },
         err.status,
       );
@@ -135,6 +136,7 @@ export class UsersController {
         {
           statusCode: err.status,
           message: err.message,
+          data: updateData,
         },
         err.status,
       );

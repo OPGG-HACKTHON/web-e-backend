@@ -115,19 +115,27 @@ export class UsersService {
       userId: userId,
     });
 
+    if (updateData.userName) {
+      const userName = await this.usersRepository.findOne({
+        userName: updateData.userName,
+      });
+      if (userName) {
+        throw new HttpException('아이디명 중복', 405);
+      }
+    }
+
     if (!user) {
       throw new HttpException('해당 사용자 없음', 404); //throw는 return 기능까지 수행한다.
-    } else {
-      if (!updateData.userPassword) updateData.userPassword = user.userPassword;
-      else {
-        const hashedPassword = await bcrypt.hash(
-          updateData.userPassword,
-          this.configservice.get('bcryptConstant.saltOrRounds'),
-        );
-        updateData.userPassword = hashedPassword;
-      }
-      this.usersRepository.update(userId, updateData);
     }
+
+    if (updateData.userPassword) {
+      const hashedPassword = await bcrypt.hash(
+        updateData.userPassword,
+        this.configservice.get('bcryptConstant.saltOrRounds'),
+      );
+      updateData.userPassword = hashedPassword;
+    }
+    this.usersRepository.update(userId, updateData);
   }
 
   //login시 updateLogic
