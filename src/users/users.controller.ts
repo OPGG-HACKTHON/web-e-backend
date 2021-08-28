@@ -72,7 +72,8 @@ export class UsersController {
   async findOne(@Param('userId') userId: string) {
     try {
       const datas = await this.userService.findOne(userId);
-      return { statusCode: 200, message: '데이터 반환 성공', data: datas };
+      const { userPassword, ...data } = datas;
+      return { statusCode: 200, message: '데이터 반환 성공', data: data };
     } catch (err) {
       throw new HttpException(
         {

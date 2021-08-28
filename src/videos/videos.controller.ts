@@ -3,7 +3,6 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   UseGuards,
@@ -15,7 +14,6 @@ import {
 } from '@nestjs/common';
 import { VideosService } from './videos.service';
 import { CreateVideoDto } from './dto/create-video.dto';
-import { UpdateVideoDto } from './dto/update-video.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import {
   ApiBadRequestResponse,
@@ -231,37 +229,6 @@ export class VideosController {
         err.status,
       );
     }
-  }
-
-  @Patch(':id')
-  @ApiOperation({ summary: '동영상 수정' })
-  @ApiOkResponse({ description: '수정 완료' })
-  @ApiUnauthorizedResponse({ description: '권한이 없음' })
-  @ApiBadRequestResponse({ description: '잘못된 입력' })
-  @ApiNotFoundResponse({ description: '해당 동영상 없음' })
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('access-token')
-  @ApiBody({ type: UpdateVideoDto })
-  @ApiConsumes('multipart/form-data')
-  @UseInterceptors(
-    FileInterceptor('video', {
-      storage: multerS3({
-        s3: s3,
-        bucket: `${config().awsS3BucketName}/videos`,
-        acl: 'public-read',
-        contentType: multerS3.AUTO_CONTENT_TYPE,
-        key: function (req, file, cb) {
-          cb(null, Date.now().toString());
-        },
-      }),
-    }),
-  )
-  async update(
-    @Param('id') id: number,
-    @Body() updateVideoDto: UpdateVideoDto,
-    @UploadedFile() file,
-  ): Promise<void> {
-    return await this.videosService.update(id, updateVideoDto, file.location);
   }
 
   @Delete(':id')

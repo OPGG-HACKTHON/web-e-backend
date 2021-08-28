@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Between, Repository } from 'typeorm';
 import { Video } from './entities/video.entity';
 import { CreateVideoDto } from './dto/create-video.dto';
-import { UpdateVideoDto } from './dto/update-video.dto';
 import { User } from 'src/users/entities/user.entity';
 import { Follow } from 'src/follow/entities/follow.entity';
 import { VideoLike } from 'src/video-like/entities/video-like.entity';
@@ -119,25 +118,6 @@ export class VideosService {
       }),
     );
     return videosData;
-  }
-
-  async update(
-    id: number,
-    updateVideoDto: UpdateVideoDto,
-    location?: string,
-  ): Promise<void> {
-    if (isNaN(id)) throw new HttpException('Id must be a nubmer.', 400);
-    const videoToUpdate = await this.videosRepository.findOne(id);
-    if (!videoToUpdate)
-      throw new HttpException(`Video with id ${id} is none.`, 404);
-    if (videoToUpdate.videoName)
-      videoToUpdate.videoName = updateVideoDto.videoName;
-    if (videoToUpdate.category)
-      videoToUpdate.category = updateVideoDto.category;
-    if (updateVideoDto.videoIntro)
-      videoToUpdate.videoIntro = updateVideoDto.videoIntro;
-    if (location) videoToUpdate.src = location;
-    await this.videosRepository.save(videoToUpdate);
   }
 
   async remove(id: number): Promise<void> {
