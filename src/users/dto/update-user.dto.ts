@@ -11,4 +11,5 @@ export class UpdateUserDto extends OmitType(User, [
   'followerCount',
   'likeUser',
   'likedUser',
+  'isPro',
 ]) {}

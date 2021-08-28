@@ -102,10 +102,23 @@ export class VideosService {
   async findUserVideos(userId: string): Promise<Video[]> {
     const user = await this.usersRepository.findOne(userId);
     if (!user) throw new HttpException('사용자 정보가 없습니다', 404);
-    const video = await this.videosRepository.find({
+    const videos = await this.videosRepository.find({
       where: { user: user },
     });
-    return video;
+    const videosData = await Promise.all(
+      videos.map(async (video) => {
+        const users = await this.usersRepository.findOne(video.userId);
+        return Object.assign(video, {
+          relation: { isFollow: false, isLike: false },
+          poster: {
+            name: users.userName,
+            picture: users.userPhotoURL,
+            followNum: users.followerCount,
+          },
+        });
+      }),
+    );
+    return videosData;
   }
 
   async update(

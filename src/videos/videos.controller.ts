@@ -180,7 +180,11 @@ export class VideosController {
   async findAllMiddle() {
     try {
       const videoList = await this.videosService.findAll(1, 200);
-      return videoList;
+      return {
+        statusCode: 200,
+        message: '비디오 리스트',
+        datas: videoList,
+      };
     } catch (err) {
       throw new HttpException(
         {
