@@ -1,8 +1,10 @@
 import {
   Body,
   Controller,
+  Get,
   HttpException,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -16,13 +18,17 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { userRole } from 'src/auth/role.decorator';
 import { RoleGuard } from 'src/auth/role.guard';
 import { Role } from 'src/users/entities/user.entity';
+import { VideosService } from 'src/videos/videos.service';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { TagsService } from './tags.service';
 
 @ApiTags('해시태그 (Tags)')
 @Controller('tags')
 export class TagsController {
-  constructor(private readonly tagsService: TagsService) {}
+  constructor(
+    private readonly tagsService: TagsService,
+    private readonly videoService: VideosService,
+  ) {}
 
   @ApiOperation({
     description: 'Tag Insert Operation',
@@ -74,5 +80,19 @@ export class TagsController {
         400,
       );
     }
+  }
+
+  @ApiOperation({
+    description: 'Tag Insert Operation',
+    summary: '태그 검색',
+  })
+  @ApiResponse({ status: 200, description: '태그 검색 성공' })
+  @ApiResponse({ status: 400, description: '태그 정보 없음' })
+  @ApiResponse({ status: 401, description: '권한 오류' })
+  @ApiResponse({ status: 404, description: '비디오 정보 없음' })
+  @Get('/search')
+  async getTags(@Query('hashtags') tagData: string[]) {
+    const data = await this.tagsService.getTags(tagData);
+    return data;
   }
 }

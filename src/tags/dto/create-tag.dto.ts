@@ -7,7 +7,7 @@ export class CreateTagDto {
   videoId: number;
   @IsString({ each: true }) // 각각 검사.
   @ApiProperty({
-    description: 'Array of Child Conversations.',
+    description: '비디오 태그 목록',
     isArray: true,
     type: String,
   })

@@ -194,6 +194,26 @@ export class VideosController {
     }
   }
 
+  @Get('/all/middle/array')
+  @ApiOperation({ summary: '비 로그인 시 동영상 리스트' })
+  @ApiOkResponse({ description: '검색 완료' })
+  @ApiUnauthorizedResponse({ description: '권한이 없음' })
+  @ApiBadRequestResponse({ description: '잘못된 입력' })
+  async findAllMiddleArray() {
+    try {
+      const videoList = await this.videosService.findAll(1, 200);
+      return videoList;
+    } catch (err) {
+      throw new HttpException(
+        {
+          statusCode: err.status,
+          message: err.message,
+        },
+        err.status,
+      );
+    }
+  }
+
   @Get(':id')
   @ApiOperation({ summary: '동영상 검색' })
   @ApiOkResponse({ description: '검색 완료' })
