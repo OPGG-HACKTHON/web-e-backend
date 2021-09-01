@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   HttpException,
+  Param,
   Post,
   Query,
   UseGuards,
@@ -86,9 +87,12 @@ export class TagsController {
   @ApiResponse({ status: 400, description: '태그 정보 없음' })
   @ApiResponse({ status: 401, description: '권한 오류' })
   @ApiResponse({ status: 404, description: '비디오 정보 없음' })
-  @Get('/search')
-  async getTags(@Query('hashtags') tagData: string[]) {
-    const data = await this.tagsService.getTags(tagData);
+  @Get('/search/:userId')
+  async getTags(
+    @Param('userId') userId: string,
+    @Query('hashtags') tagData: string[],
+  ) {
+    const data = await this.tagsService.getTags(tagData, userId);
     return data;
   }
 }
