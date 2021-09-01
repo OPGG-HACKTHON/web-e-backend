@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -21,6 +22,7 @@ import { RoleGuard } from 'src/auth/role.guard';
 import { Role } from 'src/users/entities/user.entity';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { TagsService } from './tags.service';
+import jwt_decode from 'jwt-decode';
 
 @ApiTags('해시태그 (Tags)')
 @Controller('tags')
@@ -43,7 +45,9 @@ export class TagsController {
   @userRole(Role.USER)
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Post()
-  async create(@Body() tagData: CreateTagDto) {
+  async create(@Body() tagData: CreateTagDto, @Req() req) {
+    const token = jwt_decode(req.headers.authorization);
+    console.log(token);
     if (tagData.tags.length > 0) {
       return Promise.all(
         tagData.tags.map(async (tag) => {
@@ -91,8 +95,10 @@ export class TagsController {
   async getTags(
     @Param('userId') userId: string,
     @Query('hashtags') tagData: string[],
+    @Req() req,
   ) {
     const data = await this.tagsService.getTags(tagData, userId);
+    console.log(req.headers.authorization);
     return data;
   }
 }
