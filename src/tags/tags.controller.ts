@@ -18,17 +18,13 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { userRole } from 'src/auth/role.decorator';
 import { RoleGuard } from 'src/auth/role.guard';
 import { Role } from 'src/users/entities/user.entity';
-import { VideosService } from 'src/videos/videos.service';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { TagsService } from './tags.service';
 
 @ApiTags('해시태그 (Tags)')
 @Controller('tags')
 export class TagsController {
-  constructor(
-    private readonly tagsService: TagsService,
-    private readonly videoService: VideosService,
-  ) {}
+  constructor(private readonly tagsService: TagsService) {}
 
   @ApiOperation({
     description: 'Tag Insert Operation',

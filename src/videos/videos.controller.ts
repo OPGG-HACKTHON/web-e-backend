@@ -36,6 +36,7 @@ import config from 'src/config/configuration';
 import { userRole } from 'src/auth/role.decorator';
 import { Role } from 'src/users/entities/user.entity';
 import { RoleGuard } from 'src/auth/role.guard';
+import { TagsService } from 'src/tags/tags.service';
 
 const s3 = new AWS.S3({
   accessKeyId: config().awsAccessKeyId,
@@ -46,7 +47,10 @@ const s3 = new AWS.S3({
 @ApiTags('동영상(Video)')
 @Controller('videos')
 export class VideosController {
-  constructor(private readonly videosService: VideosService) {}
+  constructor(
+    private readonly videosService: VideosService,
+    private readonly tagsService: TagsService,
+  ) {}
 
   @Post()
   @ApiOperation({ summary: '동영상 업로드' })
@@ -79,10 +83,34 @@ export class VideosController {
         createVideoDto,
         file.location,
       );
+      const hashtags = createVideoDto.tags.split(',');
+      const tags = await Promise.all(
+        hashtags.map(async (tag) => {
+          await this.tagsService.createTag(video.id, tag);
+        }),
+      )
+        .then(() => {
+          return {
+            statusCode: 201,
+            message: '태그 삽입 성공',
+            datas: createVideoDto.tags,
+          };
+        })
+        .catch((err) => {
+          throw new HttpException(
+            {
+              statusCode: err.status,
+              message: err.message,
+              data: createVideoDto,
+            },
+            err.status,
+          );
+        });
       return {
         statusCode: 201,
         message: '비디오 업로드& 정보 등록 완료',
         datas: video,
+        hashTags: tags.datas,
       };
     } catch (err) {
       throw new HttpException(
