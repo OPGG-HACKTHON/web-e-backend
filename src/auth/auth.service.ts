@@ -1,16 +1,14 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable, Req } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { LoginUserDto } from 'src/users/dto/login-user.dto';
 import * as bcrypt from 'bcrypt';
-import { FollowService } from 'src/follow/follow.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
-    private followService: FollowService,
   ) {}
 
   async validateUser(loginData: LoginUserDto): Promise<any> {
