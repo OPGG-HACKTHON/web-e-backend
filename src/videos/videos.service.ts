@@ -183,11 +183,16 @@ export class VideosService {
   async findTokenId(req: any) {
     const header = req.headers.authorization;
     if (header !== undefined) {
-      try {
-        const token = jwtDecode(header);
-        return token['userId'];
-      } catch (err) {
-        throw new HttpException('Invalid Token', 406);
+      const validToken = header.split(' ');
+      if (validToken[1] !== 'undefined') {
+        try {
+          const token = jwtDecode(header);
+          return token['userId'];
+        } catch (err) {
+          throw new HttpException('Invalid Token', 406);
+        }
+      } else {
+        return 'no-data';
       }
     } else {
       return 'no-data';
