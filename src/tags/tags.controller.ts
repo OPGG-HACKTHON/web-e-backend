@@ -3,7 +3,6 @@ import {
   Controller,
   Get,
   HttpException,
-  Param,
   Post,
   Query,
   Req,
@@ -13,6 +12,7 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiOperation,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -45,9 +45,7 @@ export class TagsController {
   @userRole(Role.USER)
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Post()
-  async create(@Body() tagData: CreateTagDto, @Req() req) {
-    const token = jwt_decode(req.headers.authorization);
-    console.log(token);
+  async create(@Body() tagData: CreateTagDto) {
     if (tagData.tags.length > 0) {
       return Promise.all(
         tagData.tags.map(async (tag) => {
@@ -84,21 +82,49 @@ export class TagsController {
   }
 
   @ApiOperation({
-    description: 'Tag Insert Operation',
+    description: 'Tag Search Operation',
     summary: '태그 검색',
   })
   @ApiResponse({ status: 200, description: '태그 검색 성공' })
   @ApiResponse({ status: 400, description: '태그 정보 없음' })
   @ApiResponse({ status: 401, description: '권한 오류' })
   @ApiResponse({ status: 404, description: '비디오 정보 없음' })
-  @Get('/search/:userId')
-  async getTags(
-    @Param('userId') userId: string,
-    @Query('hashtags') tagData: string[],
-    @Req() req,
-  ) {
-    const data = await this.tagsService.getTags(tagData, userId);
-    console.log(req.headers.authorization);
-    return data;
+  @ApiQuery({
+    name: 'hashtags',
+    description: '해시태그 검색 목록',
+    required: false,
+  })
+  @ApiBearerAuth('access-token')
+  @Get('/search')
+  async getTags(@Query() query, @Req() req) {
+    try {
+      if (!Object.keys(query).includes('hashtags')) {
+        throw new HttpException(
+          '검색 결과가 없습니다. [not have value in Query(hashtags)]',
+          400,
+        );
+      }
+      if (req.headers.authorization !== undefined) {
+        const tagArray = query.hashtags.split('+');
+        const token = jwt_decode(req.headers.authorization);
+        const data = await this.tagsService.getTags(tagArray, token['userId']);
+        return data;
+      } else {
+        const tagArray = query.hashtags.split('+');
+        const data = await this.tagsService.getTags(
+          tagArray,
+          'asdfghlkasdjkasdjlkajsdlkjasldj',
+        );
+        return data;
+      }
+    } catch (err) {
+      throw new HttpException(
+        {
+          statusCode: err.status,
+          message: err.message,
+        },
+        err.status,
+      );
+    }
   }
 }

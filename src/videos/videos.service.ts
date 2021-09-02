@@ -7,6 +7,7 @@ import { User } from 'src/users/entities/user.entity';
 import { Follow } from 'src/follow/entities/follow.entity';
 import { VideoLike } from 'src/video-like/entities/video-like.entity';
 import { Tag } from 'src/tags/entities/tags.entity';
+import jwtDecode from 'jwt-decode';
 
 @Injectable()
 export class VideosService {
@@ -71,8 +72,8 @@ export class VideosService {
   }
 
   async findAllOnUser(loginData: any, start: number, end: number) {
-    const loginUser = await this.usersRepository.findOne(loginData.id);
-    if (loginUser.userId !== loginData.id)
+    const loginUser = await this.usersRepository.findOne(loginData);
+    if (loginUser.userId !== loginData)
       throw new HttpException('권한이 없습니다(로그인 정보 불일치)', 401);
     const videos = await this.videosRepository.find({
       id: Between(start, end),
@@ -177,5 +178,15 @@ export class VideosService {
     });
     if (like) return true;
     else return false;
+  }
+
+  async findTokenId(req: any) {
+    const header = req.headers.authorization;
+    if (header !== undefined) {
+      const token = jwtDecode(header);
+      return token['userId'];
+    } else {
+      return 'no-data';
+    }
   }
 }

@@ -35,7 +35,7 @@ export class TagsService {
   //select videoId from tag where tagName regexp 'string|string2|string3...';
   async getTags(tagData: string[], userId: string) {
     if (tagData.length === 0) {
-      throw new HttpException('검색 데이터가 없습니다', 402);
+      throw new HttpException('검색 데이터가 없습니다', 202);
     }
     if (isArray(tagData)) {
       const data = tagData.join('|');

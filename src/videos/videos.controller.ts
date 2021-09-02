@@ -242,6 +242,86 @@ export class VideosController {
     }
   }
 
+  @Get('/list')
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: '동영상 리스트' })
+  @ApiOkResponse({ description: '리스트' })
+  @ApiUnauthorizedResponse({ description: '권한이 없음' })
+  @ApiBadRequestResponse({ description: '잘못된 입력' })
+  @ApiQuery({
+    name: 'end',
+    description: '끝번호',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'start',
+    description: '시작번호',
+    required: false,
+  })
+  async findAllList(@Req() req, @Query() query) {
+    try {
+      const tokenId = await this.videosService.findTokenId(req);
+      if (tokenId === 'no-data') {
+        if (
+          Object.keys(query).includes('start') &&
+          Object.keys(query).includes('end')
+        ) {
+          const videoList = await this.videosService.findAll(
+            query.start,
+            query.end,
+          );
+          return {
+            statusCode: 200,
+            message: '비디오 리스트',
+            datas: videoList,
+          };
+        } else {
+          const videoList = await this.videosService.findAll(1, 200);
+          return {
+            statusCode: 200,
+            message: '비디오 리스트',
+            datas: videoList,
+          };
+        }
+      } else {
+        if (
+          Object.keys(query).includes('start') &&
+          Object.keys(query).includes('end')
+        ) {
+          const videoList = await this.videosService.findAllOnUser(
+            tokenId,
+            query.start,
+            query.end,
+          );
+          return {
+            statusCode: 200,
+            message: '비디오 리스트',
+            datas: videoList,
+          };
+        } else {
+          const videoList = await this.videosService.findAllOnUser(
+            tokenId,
+            1,
+            200,
+          );
+          return {
+            statusCode: 200,
+            message: '비디오 리스트',
+            datas: videoList,
+          };
+        }
+      }
+    } catch (err) {
+      throw new HttpException(
+        {
+          statusCode: err.status,
+          message: err.message,
+        },
+        err.status,
+      );
+    }
+  }
+
   @Get(':id')
   @ApiOperation({ summary: '동영상 검색' })
   @ApiOkResponse({ description: '검색 완료' })
