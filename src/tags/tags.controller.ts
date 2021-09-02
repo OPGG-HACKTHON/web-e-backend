@@ -23,7 +23,6 @@ import { Role } from 'src/users/entities/user.entity';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { TagsService } from './tags.service';
 import jwt_decode from 'jwt-decode';
-import { AuthService } from 'src/auth/auth.service';
 
 @ApiTags('해시태그 (Tags)')
 @Controller('tags')
@@ -106,28 +105,34 @@ export class TagsController {
         );
       }
       if (req.headers.authorization !== undefined) {
-        const tagArray = query.hashtags.split('+');
-        try {
-          const token = jwt_decode(req.headers.authorization);
-          const data = await this.tagsService.getTags(
-            tagArray,
-            token['userId'],
-          );
-          return data;
-        } catch (err) {
-          throw new HttpException('Invalid Token', 406);
-        }
-      } else {
-        const tagArray = query.hashtags.split('+');
-        try {
+        const undefinedToken = req.headers.authorization.split(' ');
+        if (undefinedToken[1] !== 'undefined') {
+          const tagArray = query.hashtags.split('+');
+          try {
+            const token = jwt_decode(req.headers.authorization);
+            const data = await this.tagsService.getTags(
+              tagArray,
+              token['userId'],
+            );
+            return data;
+          } catch (err) {
+            throw new HttpException('Invalid Token', 406);
+          }
+        } else {
+          const tagArray = query.hashtags.split('+');
           const data = await this.tagsService.getTags(
             tagArray,
             'asdfghlkasdjkasdjlkajsdlkjasldj',
           );
           return data;
-        } catch (err) {
-          throw new HttpException('Invalid Token', 406);
         }
+      } else {
+        const tagArray = query.hashtags.split('+');
+        const data = await this.tagsService.getTags(
+          tagArray,
+          'asdfghlkasdjkasdjlkajsdlkjasldj',
+        );
+        return data;
       }
     } catch (err) {
       throw new HttpException(
