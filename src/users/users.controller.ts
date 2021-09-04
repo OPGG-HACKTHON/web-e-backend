@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -137,6 +138,48 @@ export class UsersController {
           statusCode: err.status,
           message: err.message,
           data: updateData,
+        },
+        err.status,
+      );
+    }
+  }
+
+  @ApiBearerAuth('access-token') //Bearer 토큰이 필요, 이름으로 대체
+  @ApiOperation({
+    summary: '유저 검색',
+    description: '유저 정보를 검색한다',
+  })
+  @ApiUnauthorizedResponse({ description: '사용자 권한오류' })
+  @ApiResponse({ status: 404, description: '해당 사용자 없음' })
+  @ApiBadRequestResponse({ description: '입력값 오류' })
+  @ApiOkResponse({ description: '적용완료' })
+  @Get('/search/:userId')
+  async searchUser(@Param('userId') userId: string, @Req() req) {
+    try {
+      const tokenId = await this.userService.findTokenId(req);
+      if (tokenId === 'no-data') {
+        const userList = await this.userService.searchUser(userId);
+        return {
+          statusCode: 200,
+          message: '검색 유저 리스트',
+          datas: userList,
+        };
+      } else {
+        const userList = await this.userService.searchUserOnLogin(
+          tokenId,
+          userId,
+        );
+        return {
+          statusCode: 200,
+          message: '검색 유저 리스트',
+          datas: userList,
+        };
+      }
+    } catch (err) {
+      throw new HttpException(
+        {
+          statusCode: err.status,
+          message: err.message,
         },
         err.status,
       );
