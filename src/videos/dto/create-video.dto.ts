@@ -22,6 +22,10 @@ export class CreateVideoDto {
   @ApiPropertyOptional({ type: String, description: '설명' })
   readonly videoIntro: string;
 
+  @IsString()
+  @ApiPropertyOptional({ type: String, description: '해시태그' })
+  tags: string;
+
   @IsEmpty()
   @ApiProperty({
     type: 'file',

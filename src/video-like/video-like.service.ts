@@ -106,8 +106,6 @@ export class VideoLikeService {
         'u.userId AS userId',
         'u.userName AS userName',
         'u.userPhotoURL AS userPhotoURL',
-        // 'v.describe AS describe',
-        // 'v.description AS description',
         'v.videoName AS videoName',
         'v.videoIntro AS videoIntro',
         'v.category AS category',

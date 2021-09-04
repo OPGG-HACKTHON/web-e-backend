@@ -13,6 +13,7 @@ import { User } from 'src/users/entities/user.entity';
 import { Game } from '../enums/game';
 import { ApiProperty } from '@nestjs/swagger';
 import { VideoLike } from 'src/video-like/entities/video-like.entity';
+import { Tag } from 'src/tags/entities/tags.entity';
 
 @Entity()
 export class Video {
@@ -80,4 +81,8 @@ export class Video {
   @ApiProperty({ type: VideoLike, description: '비디오 좋아요 당하는 비디오' })
   @OneToMany(() => VideoLike, (videoLike) => videoLike.likedVideo)
   likedVideo: VideoLike[];
+
+  @ApiProperty({ type: Tag, description: '비디오 태그' })
+  @OneToMany(() => Tag, (tag) => tag.video)
+  tagVideo: Tag[];
 }

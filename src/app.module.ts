@@ -13,6 +13,8 @@ import { ImageModule } from './image/image.module';
 import { FollowModule } from './follow/follow.module';
 import { VideoLikeModule } from './video-like/video-like.module';
 import { VideoLike } from './video-like/entities/video-like.entity';
+import { TagsModule } from './tags/tags.module';
+import { Tag } from './tags/entities/tags.entity';
 
 @Module({
   imports: [
@@ -31,7 +33,7 @@ import { VideoLike } from './video-like/entities/video-like.entity';
         username: configService.get('database.user'),
         password: configService.get('database.password'),
         database: configService.get('database.name'),
-        entities: [User, Video, Follow, VideoLike],
+        entities: [User, Video, Follow, VideoLike, Tag],
         synchronize: false,
       }),
     }),
@@ -42,6 +44,7 @@ import { VideoLike } from './video-like/entities/video-like.entity';
     ImageModule,
     FollowModule,
     VideoLikeModule,
+    TagsModule,
   ],
   controllers: [AppController],
   providers: [],
