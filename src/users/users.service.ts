@@ -93,12 +93,9 @@ export class UsersService {
       userData.userPassword,
       this.configservice.get('bcryptConstant.saltOrRounds'),
     );
-    await this.usersRepository.save({
-      //usersRepository.save가 DB에 저장시키는거
-      userId: userData.userId,
-      userName: userData.userName,
-      userPassword: hashedPassword,
-    });
+
+    userData.userPassword = hashedPassword;
+    await this.usersRepository.save(userData);
   }
   // 회원 삭제 logic
   async deleteUser(deleteData: LoginUserDto) {
@@ -174,7 +171,7 @@ export class UsersService {
   async searchUserOnLogin(tokenId: string, userId: string) {
     const loginUser = await this.usersRepository.findOne(tokenId);
     if (loginUser.userId !== tokenId)
-      throw new HttpException('권한이 없습니다(로그인 정보 불일치)', 401);
+      throw new HttpException('사용자 정보가 없습니다', 404);
     const users = await this.usersRepository
       .createQueryBuilder('u')
       .select([

@@ -74,7 +74,7 @@ export class VideosService {
   async findAllOnUser(loginData: any, start: number, end: number) {
     const loginUser = await this.usersRepository.findOne(loginData);
     if (loginUser.userId !== loginData)
-      throw new HttpException('권한이 없습니다(로그인 정보 불일치)', 401);
+      throw new HttpException('사용자 정보가 없습니다', 404);
     const videos = await this.videosRepository.find({
       id: Between(start, end),
     });
@@ -140,7 +140,7 @@ export class VideosService {
   ) {
     const loginUser = await this.usersRepository.findOne(loginData);
     if (loginUser.userId !== loginData)
-      throw new HttpException('권한이 없습니다(로그인 정보 불일치)', 401);
+      throw new HttpException('사용자 정보가 없습니다', 404);
     const videos = await this.videosRepository.find({
       id: Between(start, end),
       userId: userId,
