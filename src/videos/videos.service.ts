@@ -106,6 +106,73 @@ export class VideosService {
     return videosData;
   }
 
+  async findSearchAll(start: number, end: number, userId: string) {
+    const videos = await this.videosRepository.find({
+      id: Between(start, end),
+      userId: userId,
+    });
+    const videosData = await Promise.all(
+      videos.map(async (video) => {
+        const users = await this.usersRepository.findOne(video.userId);
+        const hashTags = await this.tagRepository.find({
+          select: ['tagName'],
+          where: { videoId: video.id },
+        });
+        return Object.assign(video, {
+          hashTags: hashTags.map(({ tagName }) => tagName),
+          relation: { isFollow: false, isLike: false },
+          poster: {
+            name: users.userName,
+            picture: users.userPhotoURL,
+            followNum: users.followerCount,
+          },
+        });
+      }),
+    );
+    return videosData;
+  }
+
+  async findSearchUser(
+    loginData: any,
+    start: number,
+    end: number,
+    userId: string,
+  ) {
+    const loginUser = await this.usersRepository.findOne(loginData);
+    if (loginUser.userId !== loginData)
+      throw new HttpException('권한이 없습니다(로그인 정보 불일치)', 401);
+    const videos = await this.videosRepository.find({
+      id: Between(start, end),
+      userId: userId,
+    });
+    const videosData = await Promise.all(
+      videos.map(async (video) => {
+        const isFollow = await this.isFollow(loginUser.userId, video.userId);
+        const isLike = await this.isLike(
+          loginUser.userId,
+          video.userId,
+          video.id,
+        );
+        const users = await this.usersRepository.findOne(video.userId);
+        if (!users) throw new HttpException('사용자 정보가 없습니다', 404);
+        const hashTags = await this.tagRepository.find({
+          select: ['tagName'],
+          where: { videoId: video.id },
+        });
+        return Object.assign(video, {
+          hashTags: hashTags.map(({ tagName }) => tagName),
+          relation: { isFollow: isFollow, isLike: isLike },
+          poster: {
+            name: users.userName,
+            picture: users.userPhotoURL,
+            followNum: users.followerCount,
+          },
+        });
+      }),
+    );
+    return videosData;
+  }
+
   async findOne(id: number): Promise<Video> {
     if (isNaN(id)) throw new HttpException('Id must be a nubmer.', 400);
     const video = await this.videosRepository.findOne(id);
