@@ -8,6 +8,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { User } from './users/entities/user.entity';
 import { Video } from './videos/entities/video.entity';
 import { Follow } from './follow/entities/follow.entity';
+import { Comment } from './comment/entities/comment.entity';
 import { VideosModule } from './videos/videos.module';
 import { ImageModule } from './image/image.module';
 import { FollowModule } from './follow/follow.module';
@@ -15,6 +16,7 @@ import { VideoLikeModule } from './video-like/video-like.module';
 import { VideoLike } from './video-like/entities/video-like.entity';
 import { TagsModule } from './tags/tags.module';
 import { Tag } from './tags/entities/tags.entity';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
   imports: [
@@ -33,7 +35,7 @@ import { Tag } from './tags/entities/tags.entity';
         username: configService.get('database.user'),
         password: configService.get('database.password'),
         database: configService.get('database.name'),
-        entities: [User, Video, Follow, VideoLike, Tag],
+        entities: [User, Video, Follow, VideoLike, Tag, Comment],
         synchronize: false,
       }),
     }),
@@ -45,6 +47,7 @@ import { Tag } from './tags/entities/tags.entity';
     FollowModule,
     VideoLikeModule,
     TagsModule,
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [],
