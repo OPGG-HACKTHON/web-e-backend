@@ -328,26 +328,93 @@ export class VideosController {
   @ApiUnauthorizedResponse({ description: '권한이 없음' })
   @ApiBadRequestResponse({ description: '잘못된 입력' })
   @ApiNotFoundResponse({ description: '해당 동영상 없음' })
+  @ApiQuery({
+    name: 'end',
+    description: '끝번호',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'start',
+    description: '시작번호',
+    required: false,
+  })
   async findOne(@Param('id') id: number): Promise<Video> {
     await this.videosService.increaseViews(id);
     return await this.videosService.findOne(id);
   }
 
   @Get('/user/:userId')
+  @ApiBearerAuth('access-token')
   @ApiOperation({ summary: '특정 사용자 동영상들 검색' })
   @ApiOkResponse({ description: '검색 완료' })
   @ApiUnauthorizedResponse({ description: '권한이 없음' })
   @ApiBadRequestResponse({ description: '잘못된 입력' })
   @ApiNotFoundResponse({ description: '해당 동영상 없음' })
   @ApiResponse({ status: 404, description: '사용자 정보 없음' })
-  async findUserVideos(@Param('userId') userId: string) {
+  async findUserVideos(
+    @Param('userId') userId: string,
+    @Req() req,
+    @Query() query,
+  ) {
     try {
-      const videoList = await this.videosService.findUserVideos(userId);
-      return {
-        statusCode: 200,
-        message: '비디오 리스트',
-        datas: videoList,
-      };
+      const tokenId = await this.videosService.findTokenId(req);
+      if (tokenId === 'no-data') {
+        if (
+          Object.keys(query).includes('start') &&
+          Object.keys(query).includes('end')
+        ) {
+          const videoList = await this.videosService.findSearchAll(
+            query.start,
+            query.end,
+            userId,
+          );
+          return {
+            statusCode: 200,
+            message: '비디오 리스트',
+            datas: videoList,
+          };
+        } else {
+          const videoList = await this.videosService.findSearchAll(
+            1,
+            200,
+            userId,
+          );
+          return {
+            statusCode: 200,
+            message: '비디오 리스트',
+            datas: videoList,
+          };
+        }
+      } else {
+        if (
+          Object.keys(query).includes('start') &&
+          Object.keys(query).includes('end')
+        ) {
+          const videoList = await this.videosService.findSearchUser(
+            tokenId,
+            query.start,
+            query.end,
+            userId,
+          );
+          return {
+            statusCode: 200,
+            message: '비디오 리스트',
+            datas: videoList,
+          };
+        } else {
+          const videoList = await this.videosService.findSearchUser(
+            tokenId,
+            1,
+            200,
+            userId,
+          );
+          return {
+            statusCode: 200,
+            message: '비디오 리스트',
+            datas: videoList,
+          };
+        }
+      }
     } catch (err) {
       throw new HttpException(
         {
