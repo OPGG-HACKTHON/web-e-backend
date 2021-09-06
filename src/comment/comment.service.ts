@@ -5,6 +5,7 @@ import { Comment } from 'src/comment/entities/comment.entity';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { Video } from 'src/videos/entities/video.entity';
 import { User } from 'src/users/entities/user.entity';
+import { isNumber } from 'class-validator';
 
 @Injectable()
 export class CommentService {
@@ -43,5 +44,27 @@ export class CommentService {
     });
     video.comments = video.comments + 1;
     await this.videoRepository.save(video);
+  }
+
+  async getComment(videoId: number) {
+    if (videoId === undefined || !isNumber(videoId)) {
+      throw new HttpException(
+        '찾으려는 데이터를 입력하거나, videoId를 입력해 주세요',
+        400,
+      );
+    }
+    const commentList = await this.commentRepository
+      .createQueryBuilder('c')
+      .innerJoin(User, 'u', 'c.userId = u.userId')
+      .select([
+        'c.videoId AS videoId',
+        'u.userId AS userId',
+        'u.userName AS userName',
+        'u.userPhotoURL AS userPhotoURL',
+        'c.content AS content',
+      ])
+      .where('c.videoId = :id', { id: videoId })
+      .getRawMany();
+    return commentList;
   }
 }

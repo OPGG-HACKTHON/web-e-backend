@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Get,
   HttpException,
+  Param,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -57,6 +59,27 @@ export class CommentController {
           statusCode: err.status,
           message: err.message,
           data: commentData,
+        },
+        err.status,
+      );
+    }
+  }
+
+  @Get(':videoId')
+  async getComment(@Param('videoId') videoId: number) {
+    try {
+      const commentList = await this.commentService.getComment(videoId);
+      return {
+        statusCode: 200,
+        message: '댓글 리스트',
+        datas: commentList,
+      };
+    } catch (err) {
+      throw new HttpException(
+        {
+          statusCode: err.status,
+          message: err.message,
+          data: videoId,
         },
         err.status,
       );
