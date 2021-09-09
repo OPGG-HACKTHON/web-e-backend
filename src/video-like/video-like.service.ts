@@ -57,12 +57,12 @@ export class VideoLikeService {
     if (!likeVideo)
       throw new HttpException(
         {
-          statusCode: 400,
+          statusCode: 404,
           message: '좋아요 받는 비디오 정보 없음',
           error: 'VIDEO-001',
           data: likeData,
         },
-        400,
+        404,
       );
     if (already)
       throw new HttpException(
