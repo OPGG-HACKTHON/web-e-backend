@@ -34,7 +34,7 @@ export class TagsController {
     summary: '태그 삽입',
   })
   @ApiResponse({ status: 201, description: '태그 입력 성공' })
-  @ApiResponse({ status: 400, description: '태그 정보 없음' })
+  @ApiResponse({ status: 400, description: '태그 입력 정보 없음' })
   @ApiResponse({ status: 401, description: '권한 오류' })
   @ApiResponse({ status: 404, description: '비디오 정보 없음' })
   @ApiBody({
@@ -80,9 +80,9 @@ export class TagsController {
     summary: '태그 검색',
   })
   @ApiResponse({ status: 200, description: '태그 검색 성공' })
-  @ApiResponse({ status: 400, description: '태그 정보 없음' })
+  @ApiResponse({ status: 400, description: '태그 검색 정보 없음' })
   @ApiResponse({ status: 401, description: '권한 오류' })
-  @ApiResponse({ status: 404, description: '비디오 정보 없음' })
+  @ApiResponse({ status: 404, description: '비디오 정보 or 토큰 정보 없음' })
   @ApiQuery({
     name: 'hashtags',
     description: '해시태그 검색 목록',

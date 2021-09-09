@@ -51,13 +51,7 @@ export class VideoLikeController {
       const like = this.videoLikeService.create(likeData, req.user);
       return like;
     } catch (err) {
-      throw new HttpException(
-        {
-          statusCode: err.status,
-          message: err.message,
-        },
-        err.status,
-      );
+      throw new HttpException(err.response, err.status);
     }
   }
 
@@ -78,13 +72,7 @@ export class VideoLikeController {
         listCount: list.length,
       };
     } catch (err) {
-      throw new HttpException(
-        {
-          statusCode: err.status,
-          message: err.message,
-        },
-        err.status,
-      );
+      throw new HttpException(err.response, err.status);
     }
   }
 
@@ -105,13 +93,7 @@ export class VideoLikeController {
         listCount: list.length,
       };
     } catch (err) {
-      throw new HttpException(
-        {
-          statusCode: err.status,
-          message: err.message,
-        },
-        err.status,
-      );
+      throw new HttpException(err.response, err.status);
     }
   }
 
@@ -130,13 +112,7 @@ export class VideoLikeController {
       const dislike = await this.videoLikeService.dislike(req.user, likeData);
       return dislike;
     } catch (err) {
-      throw new HttpException(
-        {
-          statusCode: err.status,
-          message: err.message,
-        },
-        err.status,
-      );
+      throw new HttpException(err.response, err.status);
     }
   }
 }

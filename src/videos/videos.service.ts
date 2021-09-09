@@ -328,7 +328,7 @@ export class VideosService {
         {
           statusCode: 404,
           message: '업데이트할 비디오 정보 없음',
-          error: 'VIDEO-002',
+          error: 'VIDEO-001',
           data: id,
         },
         404,
