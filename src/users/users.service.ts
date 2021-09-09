@@ -28,7 +28,15 @@ export class UsersService {
       userId: userId,
     });
     if (!user) {
-      throw new HttpException('사용자가 존재하지 않습니다.', 404); //throw는 return 기능까지 수행한다.
+      throw new HttpException(
+        {
+          statusCode: 404,
+          message: '유저 정보가 없습니다',
+          error: 'USER-001',
+          data: userId,
+        },
+        404,
+      ); //throw는 return 기능까지 수행한다.
     }
 
     return await this.usersRepository.findOne({ userId: userId });
@@ -36,17 +44,41 @@ export class UsersService {
   // login정보 확인 logic
   async checkLoginData(loginData: LoginUserDto): Promise<boolean> {
     if (!loginData.userId) {
-      throw new HttpException('아이디 없음', 400);
+      throw new HttpException(
+        {
+          statusCode: 400,
+          message: '입력 아이디 없음',
+          error: 'INPUT-001',
+          data: loginData,
+        },
+        400,
+      );
     }
     if (!loginData.userPassword) {
-      throw new HttpException('비밀번호 없음', 400);
+      throw new HttpException(
+        {
+          statusCode: 400,
+          message: '입력 비밀번호 없음',
+          error: 'INPUT-002',
+          data: loginData,
+        },
+        400,
+      );
     }
     const user = await this.usersRepository.findOne({
       userId: loginData.userId,
     });
 
     if (!user) {
-      throw new HttpException('해당 사용자 없음', 404); //throw는 return 기능까지 수행한다.
+      throw new HttpException(
+        {
+          statusCode: 404,
+          message: '유저 정보 없음',
+          error: 'USER-001',
+          data: loginData,
+        },
+        404,
+      ); //throw는 return 기능까지 수행한다.
     }
 
     const isMatch = await bcrypt.compare(
@@ -56,21 +88,53 @@ export class UsersService {
     if (isMatch) {
       return true;
     } else {
-      throw new HttpException('비밀번호 불일치 (삭제불가)', 400);
+      throw new HttpException(
+        {
+          statusCode: 404,
+          message: '비밀번호 틀림',
+          error: 'USER-002',
+          data: loginData,
+        },
+        404,
+      );
     }
   }
   // 회원가입 logic
   async register(userData: CreateUserDto) {
     if (!userData.userId) {
-      throw new HttpException('아이디가 없습니다.', 400);
+      throw new HttpException(
+        {
+          statusCode: 400,
+          message: '입력 아이디 없음',
+          error: 'INPUT-001',
+          data: userData,
+        },
+        400,
+      );
     }
 
     if (!userData.userPassword) {
-      throw new HttpException('비밀번호가 없습니다.', 400);
+      throw new HttpException(
+        {
+          statusCode: 400,
+          message: '입력 비밀번호 없음',
+          error: 'INPUT-002',
+          data: userData,
+        },
+        400,
+      );
     }
 
     if (!userData.userName) {
-      throw new HttpException('유저명이 없습니다.', 400);
+      throw new HttpException(
+        {
+          statusCode: 400,
+          message: '입력 유저네임(닉네임) 없음',
+          error: 'INPUT-003',
+          data: userData,
+        },
+        400,
+      );
     }
 
     const user = await this.usersRepository.findOne({
@@ -82,11 +146,27 @@ export class UsersService {
     });
 
     if (user) {
-      throw new HttpException('아이디 중복', 403); //throw는 return 기능까지 수행한다.
+      throw new HttpException(
+        {
+          statusCode: 409,
+          message: '유저아이디 중복',
+          error: 'USER-003',
+          data: userData,
+        },
+        409,
+      ); //throw는 return 기능까지 수행한다.
     }
 
     if (userName) {
-      throw new HttpException('유저 네임(UserName) 중복', 405); //throw는 return 기능까지 수행한다.
+      throw new HttpException(
+        {
+          statusCode: 409,
+          message: '유저네임(닉네임) 중복',
+          error: 'USER-004',
+          data: userData,
+        },
+        409,
+      ); //throw는 return 기능까지 수행한다.
     }
 
     const hashedPassword = await bcrypt.hash(
@@ -103,30 +183,62 @@ export class UsersService {
     if (isMatch) {
       return await this.usersRepository.delete({ userId: deleteData.userId });
     } else {
-      throw new HttpException('비밀번호 불일치 (삭제불가)', 406);
+      throw new HttpException(
+        {
+          statusCode: 404,
+          message: '비밀번호 틀림(삭제 불가)',
+          error: 'USER-002',
+          data: deleteData,
+        },
+        404,
+      );
     }
   }
   // 회원 정보 갱신 logic
   async updateUser(userId: string, updateData: UpdateUserDto) {
     if (!userId) {
-      throw new HttpException('아이디 없음', 400);
+      throw new HttpException(
+        {
+          statusCode: 400,
+          message: '입력 아이디 없음',
+          error: 'INPUT-001',
+          data: { userId: userId, updateData: updateData },
+        },
+        400,
+      );
     }
 
     const user = await this.usersRepository.findOne({
       userId: userId,
     });
 
+    if (!user) {
+      throw new HttpException(
+        {
+          statusCode: 404,
+          message: '유저 정보 없음',
+          error: 'USER-001',
+          data: { userId: userId, updateData: updateData },
+        },
+        404,
+      ); //throw는 return 기능까지 수행한다.
+    }
+
     if (updateData.userName) {
       const userName = await this.usersRepository.findOne({
         userName: updateData.userName,
       });
       if (userName) {
-        throw new HttpException('아이디명 중복', 405);
+        throw new HttpException(
+          {
+            statusCode: 409,
+            message: '유저네임 중복',
+            error: 'USER-003',
+            data: { userId: userId, updateData: updateData },
+          },
+          409,
+        );
       }
-    }
-
-    if (!user) {
-      throw new HttpException('해당 사용자 없음', 404); //throw는 return 기능까지 수행한다.
     }
 
     if (updateData.userPassword) {
@@ -142,7 +254,16 @@ export class UsersService {
   //login시 updateLogic
   async updateLoginAt(userId: string) {
     const user = await this.usersRepository.findOne({ userId: userId });
-    if (!user) throw new HttpException('해당 사용자 없음', 404);
+    if (!user)
+      throw new HttpException(
+        {
+          statusCode: 404,
+          message: '유저 정보 없음',
+          error: 'USER-001',
+          data: userId,
+        },
+        404,
+      );
     else {
       user.loginAt = new Date();
       await this.usersRepository.update(user.userId, user);
@@ -171,7 +292,15 @@ export class UsersService {
   async searchUserOnLogin(tokenId: string, userId: string) {
     const loginUser = await this.usersRepository.findOne(tokenId);
     if (loginUser.userId !== tokenId)
-      throw new HttpException('사용자 정보가 없습니다', 404);
+      throw new HttpException(
+        {
+          statusCode: 404,
+          message: '유저 정보 없음',
+          error: 'USER-001',
+          data: { tokenId: tokenId, userId: userId },
+        },
+        404,
+      );
     const users = await this.usersRepository
       .createQueryBuilder('u')
       .select([

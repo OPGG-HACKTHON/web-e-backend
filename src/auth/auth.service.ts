@@ -14,7 +14,15 @@ export class AuthService {
   async validateUser(loginData: LoginUserDto): Promise<any> {
     const user = await this.usersService.findOne(loginData.userId);
     if (!user) {
-      throw new HttpException('유저 정보가 없습니다.', 401);
+      throw new HttpException(
+        {
+          statusCode: 404,
+          message: '유저 정보 없음',
+          error: 'USER-001',
+          data: loginData,
+        },
+        404,
+      );
     }
 
     const isMatch = await bcrypt.compare(
@@ -25,7 +33,15 @@ export class AuthService {
       const { userPassword, ...result } = user;
       return result;
     } else {
-      throw new HttpException('비밀번호가 일치하지 않습니다.', 400);
+      throw new HttpException(
+        {
+          statusCode: 404,
+          message: '비밀번호 틀림',
+          error: 'USER-002',
+          data: loginData,
+        },
+        404,
+      );
     }
   }
 
