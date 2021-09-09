@@ -97,14 +97,7 @@ export class VideosController {
           };
         })
         .catch((err) => {
-          throw new HttpException(
-            {
-              statusCode: err.status,
-              message: err.message,
-              data: createVideoDto,
-            },
-            err.status,
-          );
+          throw new HttpException(err.response, err.status);
         });
       return {
         statusCode: 201,
@@ -113,13 +106,7 @@ export class VideosController {
         hashTags: tags.datas,
       };
     } catch (err) {
-      throw new HttpException(
-        {
-          statusCode: err.status,
-          message: err.message,
-        },
-        err.status,
-      );
+      throw new HttpException(err.response, err.status);
     }
   }
 
@@ -153,13 +140,7 @@ export class VideosController {
         datas: videoList,
       };
     } catch (err) {
-      throw new HttpException(
-        {
-          statusCode: err.status,
-          message: err.message,
-        },
-        err.status,
-      );
+      throw new HttpException(err.response, err.status);
     }
   }
 
@@ -188,13 +169,7 @@ export class VideosController {
         datas: videoList,
       };
     } catch (err) {
-      throw new HttpException(
-        {
-          statusCode: err.status,
-          message: err.message,
-        },
-        err.status,
-      );
+      throw new HttpException(err.response, err.status);
     }
   }
 
@@ -212,13 +187,7 @@ export class VideosController {
         datas: videoList,
       };
     } catch (err) {
-      throw new HttpException(
-        {
-          statusCode: err.status,
-          message: err.message,
-        },
-        err.status,
-      );
+      throw new HttpException(err.response, err.status);
     }
   }
 
@@ -232,13 +201,7 @@ export class VideosController {
       const videoList = await this.videosService.findAll(1, 200);
       return videoList;
     } catch (err) {
-      throw new HttpException(
-        {
-          statusCode: err.status,
-          message: err.message,
-        },
-        err.status,
-      );
+      throw new HttpException(err.response, err.status);
     }
   }
 
@@ -312,13 +275,7 @@ export class VideosController {
         }
       }
     } catch (err) {
-      throw new HttpException(
-        {
-          statusCode: err.status,
-          message: err.message,
-        },
-        err.status,
-      );
+      throw new HttpException(err.response, err.status);
     }
   }
 
@@ -416,13 +373,7 @@ export class VideosController {
         }
       }
     } catch (err) {
-      throw new HttpException(
-        {
-          statusCode: err.status,
-          message: err.message,
-        },
-        err.status,
-      );
+      throw new HttpException(err.response, err.status);
     }
   }
 

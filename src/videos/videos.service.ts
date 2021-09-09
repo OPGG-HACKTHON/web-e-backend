@@ -36,7 +36,15 @@ export class VideosService {
     const videoUserId = createVideoDto.userId;
     const user = await this.usersRepository.findOne(videoUserId);
     if (!user)
-      throw new HttpException(`User with id ${videoUserId} is none.`, 404);
+      throw new HttpException(
+        {
+          statusCode: 404,
+          message: '사용자 정보 없음',
+          error: 'USER-001',
+          data: createVideoDto,
+        },
+        404,
+      );
     video.user = user;
     video.userId = videoUserId;
     video.videoName = createVideoDto.videoName;
@@ -74,7 +82,15 @@ export class VideosService {
   async findAllOnUser(loginData: any, start: number, end: number) {
     const loginUser = await this.usersRepository.findOne(loginData);
     if (loginUser.userId !== loginData)
-      throw new HttpException('사용자 정보가 없습니다', 404);
+      throw new HttpException(
+        {
+          statusCode: 404,
+          message: '사용자 정보 없음',
+          error: 'USER-001',
+          data: { loginData: loginData, start: start, end: end },
+        },
+        404,
+      );
     const videos = await this.videosRepository.find({
       id: Between(start, end),
     });
@@ -87,7 +103,16 @@ export class VideosService {
           video.id,
         );
         const users = await this.usersRepository.findOne(video.userId);
-        if (!users) throw new HttpException('사용자 정보가 없습니다', 404);
+        if (!users)
+          throw new HttpException(
+            {
+              statusCode: 404,
+              message: '사용자 정보 없음',
+              error: 'USER-001',
+              data: { loginData: loginData, start: start, end: end },
+            },
+            404,
+          );
         const hashTags = await this.tagRepository.find({
           select: ['tagName'],
           where: { videoId: video.id },
@@ -140,7 +165,20 @@ export class VideosService {
   ) {
     const loginUser = await this.usersRepository.findOne(loginData);
     if (loginUser.userId !== loginData)
-      throw new HttpException('사용자 정보가 없습니다', 404);
+      throw new HttpException(
+        {
+          statusCode: 404,
+          message: '사용자 정보 없음',
+          error: 'USER-001',
+          data: {
+            loginData: loginData,
+            userId: userId,
+            start: start,
+            end: end,
+          },
+        },
+        404,
+      );
     const videos = await this.videosRepository.find({
       id: Between(start, end),
       userId: userId,
@@ -154,7 +192,21 @@ export class VideosService {
           video.id,
         );
         const users = await this.usersRepository.findOne(video.userId);
-        if (!users) throw new HttpException('사용자 정보가 없습니다', 404);
+        if (!users)
+          throw new HttpException(
+            {
+              statusCode: 404,
+              message: '비디오 사용자 정보 없음',
+              error: 'USER-001',
+              data: {
+                loginData: loginData,
+                userId: video.userId,
+                start: start,
+                end: end,
+              },
+            },
+            404,
+          );
         const hashTags = await this.tagRepository.find({
           select: ['tagName'],
           where: { videoId: video.id },
@@ -174,15 +226,42 @@ export class VideosService {
   }
 
   async findOne(id: number): Promise<Video> {
-    if (isNaN(id)) throw new HttpException('Id must be a nubmer.', 400);
+    if (isNaN(id))
+      throw new HttpException(
+        {
+          statusCode: 400,
+          message: '비디오 입력정보 오류',
+          error: 'INPUT-004',
+          data: id,
+        },
+        400,
+      );
     const video = await this.videosRepository.findOne(id);
-    if (!video) throw new HttpException(`Video with id ${id} is none.`, 404);
+    if (!video)
+      throw new HttpException(
+        {
+          statusCode: 404,
+          message: '비디오 정보 없음',
+          error: 'VIDEO-001',
+          data: id,
+        },
+        404,
+      );
     return video;
   }
 
   async findUserVideos(userId: string): Promise<Video[]> {
     const user = await this.usersRepository.findOne(userId);
-    if (!user) throw new HttpException('사용자 정보가 없습니다', 404);
+    if (!user)
+      throw new HttpException(
+        {
+          statusCode: 404,
+          message: '비디오 사용자 정보 없음',
+          error: 'USER-001',
+          data: userId,
+        },
+        404,
+      );
     const videos = await this.videosRepository.find({
       where: { user: user },
     });
@@ -208,17 +287,52 @@ export class VideosService {
   }
 
   async remove(id: number): Promise<void> {
-    if (isNaN(id)) throw new HttpException('Id must be a nubmer.', 400);
+    if (isNaN(id))
+      throw new HttpException(
+        {
+          statusCode: 400,
+          message: '비디오 입력정보 오류',
+          error: 'INPUT-004',
+          data: id,
+        },
+        400,
+      );
     const video = await this.videosRepository.findOne(id);
-    if (!video) throw new HttpException(`Video with id ${id} is none.`, 404);
+    if (!video)
+      throw new HttpException(
+        {
+          statusCode: 404,
+          message: '비디오 정보 없음',
+          error: 'USER-001',
+          data: id,
+        },
+        404,
+      );
     await this.videosRepository.delete(id);
   }
 
   async increaseViews(id: number): Promise<void> {
-    if (isNaN(id)) throw new HttpException('Id must be a nubmer.', 400);
+    if (isNaN(id))
+      throw new HttpException(
+        {
+          statusCode: 400,
+          message: '비디오 입력정보 오류',
+          error: 'INPUT-004',
+          data: id,
+        },
+        400,
+      );
     const videoToUpdate = await this.videosRepository.findOne(id);
     if (!videoToUpdate)
-      throw new HttpException(`Video with id ${id} is none.`, 404);
+      throw new HttpException(
+        {
+          statusCode: 404,
+          message: '업데이트할 비디오 정보 없음',
+          error: 'VIDEO-002',
+          data: id,
+        },
+        404,
+      );
     videoToUpdate.views++;
     await this.videosRepository.save(videoToUpdate);
   }
@@ -256,7 +370,14 @@ export class VideosService {
           const token = jwtDecode(header);
           return token['userId'];
         } catch (err) {
-          throw new HttpException('Invalid Token', 406);
+          throw new HttpException(
+            {
+              statusCode: 404,
+              message: '토큰 정보 없음',
+              error: 'TOKEN-001',
+            },
+            404,
+          );
         }
       } else {
         return 'no-data';

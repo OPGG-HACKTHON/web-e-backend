@@ -279,7 +279,14 @@ export class UsersService {
           const token = jwtDecode(header);
           return token['userId'];
         } catch (err) {
-          throw new HttpException('Invalid Token', 406);
+          throw new HttpException(
+            {
+              statusCode: 404,
+              message: '토큰 정보 없음',
+              error: 'TOKEN-001',
+            },
+            404,
+          );
         }
       } else {
         return 'no-data';
