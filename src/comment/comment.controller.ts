@@ -54,14 +54,7 @@ export class CommentController {
         data: commentData,
       };
     } catch (err) {
-      throw new HttpException(
-        {
-          statusCode: err.status,
-          message: err.message,
-          data: commentData,
-        },
-        err.status,
-      );
+      throw new HttpException(err.response, err.status);
     }
   }
 
@@ -75,14 +68,7 @@ export class CommentController {
         datas: commentList,
       };
     } catch (err) {
-      throw new HttpException(
-        {
-          statusCode: err.status,
-          message: err.message,
-          data: videoId,
-        },
-        err.status,
-      );
+      throw new HttpException(err.response, err.status);
     }
   }
 }

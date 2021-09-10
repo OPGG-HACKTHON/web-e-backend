@@ -22,20 +22,52 @@ export class CommentService {
       id: commentData.videoId,
     });
     if (!video) {
-      throw new HttpException('비디오 정보가 없습니다', 405);
+      throw new HttpException(
+        {
+          statusCode: 404,
+          message: '좋아요 받는 비디오 정보 없음',
+          error: 'VIDEO-001',
+          data: commentData,
+        },
+        404,
+      );
     }
     const user = await this.userRepository.findOne({
       userId: commentData.userId,
     });
     const comment = await this.commentRepository.findOne(commentData);
     if (comment) {
-      throw new HttpException('이미 입력한 댓글입니다', 408);
+      throw new HttpException(
+        {
+          statusCode: 409,
+          message: '이미 입력한 댓글',
+          error: 'COMMENT-001',
+          data: commentData,
+        },
+        409,
+      );
     }
     if (commentData.content === undefined) {
-      throw new HttpException('댓글 내용을 작성해야 합니다', 400);
+      throw new HttpException(
+        {
+          statusCode: 400,
+          message: 'Comment 내용 없음',
+          error: 'INPUT-007',
+          data: commentData,
+        },
+        400,
+      );
     }
     if (!user) {
-      throw new HttpException('유저 정보가 없습니다', 406);
+      throw new HttpException(
+        {
+          statusCode: 404,
+          message: '유저 정보 없음',
+          error: 'USER-001',
+          data: commentData,
+        },
+        404,
+      );
     }
     await this.commentRepository.save({
       userId: commentData.userId,
@@ -49,7 +81,12 @@ export class CommentService {
   async getComment(videoId: number) {
     if (videoId === undefined || !isNumber(videoId)) {
       throw new HttpException(
-        '찾으려는 데이터를 입력하거나, videoId를 입력해 주세요',
+        {
+          statusCode: 400,
+          message: '비디오 아이디 없음',
+          error: 'INPUT-004',
+          data: videoId,
+        },
         400,
       );
     }
