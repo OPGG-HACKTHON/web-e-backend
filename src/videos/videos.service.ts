@@ -148,11 +148,23 @@ export class VideosService {
     const videosLikeLOL = await this.videoLikeRepository
       .createQueryBuilder('vl')
       .innerJoin(User, 'u', 'vl.userId = u.userId')
+      .innerJoin(Video, 'v', 'vl.videoId = v.id')
       .select([
         'u.lolTier AS lolTier',
-        'vl.videoId AS videoId',
         'count(vl.videoId) AS cnt',
+        'vl.videoId AS id',
+        'v.createTime AS createTime',
+        'v.updateTime AS updateTime',
+        'v.views AS views',
+        'v.videoName AS videoName',
+        'v.src AS src',
+        'v.category AS category',
+        'v.videoIntro AS videoIntro',
+        'v.userId AS userId',
+        'v.likes AS likes',
+        'v.comments AS comments',
       ])
+      .where('v.category =:lol', { lol: 'lol' })
       .groupBy('vl.videoId, u.lolTier')
       .having('u.lolTier=:lolTier', { lolTier: loginData.lolTier })
       .orderBy('cnt', 'DESC')
@@ -161,11 +173,23 @@ export class VideosService {
     const videosLikePUBG = await this.videoLikeRepository
       .createQueryBuilder('vl')
       .innerJoin(User, 'u', 'vl.userId = u.userId')
+      .innerJoin(Video, 'v', 'vl.videoId = v.id')
       .select([
         'u.pubgTier AS pubgTier',
-        'vl.videoId AS videoId',
         'count(vl.videoId) AS cnt',
+        'vl.videoId AS id',
+        'v.createTime AS createTime',
+        'v.updateTime AS updateTime',
+        'v.views AS views',
+        'v.videoName AS videoName',
+        'v.src AS src',
+        'v.category AS category',
+        'v.videoIntro AS videoIntro',
+        'v.userId AS userId',
+        'v.likes AS likes',
+        'v.comments AS comments',
       ])
+      .where('v.category =:pubg', { pubg: 'pubg' })
       .groupBy('vl.videoId, u.pubgTier')
       .having('u.pubgTier=:pubgTier', { pubgTier: loginData.pubgTier })
       .orderBy('cnt', 'DESC')
@@ -174,33 +198,29 @@ export class VideosService {
     const videosLikeWatch = await this.videoLikeRepository
       .createQueryBuilder('vl')
       .innerJoin(User, 'u', 'vl.userId = u.userId')
+      .innerJoin(Video, 'v', 'vl.videoId = v.id')
       .select([
         'u.watchTier AS watchTier',
-        'vl.videoId AS videoId',
         'count(vl.videoId) AS cnt',
+        'vl.videoId AS id',
+        'v.createTime AS createTime',
+        'v.updateTime AS updateTime',
+        'v.views AS views',
+        'v.videoName AS videoName',
+        'v.src AS src',
+        'v.category AS category',
+        'v.videoIntro AS videoIntro',
+        'v.userId AS userId',
+        'v.likes AS likes',
+        'v.comments AS comments',
       ])
+      .where('v.category =:overwatch', { overwatch: 'overwatch' })
       .groupBy('vl.videoId, u.watchTier')
       .having('u.watchTier=:watchTier', { watchTier: loginData.watchTier })
       .orderBy('cnt', 'DESC')
       .getRawMany();
-
-    const videosLike = videosLikeLOL
-      .map(({ videoId }) => videoId)
-      .reverse()
-      .concat(
-        videosLikePUBG.map(({ videoId }) => videoId).reverse(),
-        videosLikeWatch.map(({ videoId }) => videoId).reverse(),
-      );
-    console.log(videosLike);
-    const videos = await this.videosRepository
-      .createQueryBuilder('v')
-      .orderBy('FIELD(v.id, :...Ids)', 'DESC')
-      .setParameters({
-        Ids: videosLike,
-      })
-      .getRawMany();
-    const videosData = await Promise.all(
-      videos.map(async (video) => {
+    const videosDataLOL = await Promise.all(
+      videosLikeLOL.map(async (video) => {
         const isFollow = await this.isFollow(loginUser.userId, video.userId);
         const isLike = await this.isLike(
           loginUser.userId,
@@ -233,7 +253,81 @@ export class VideosService {
         });
       }),
     );
-    return videosData;
+
+    const videosDataPUBG = await Promise.all(
+      videosLikePUBG.map(async (video) => {
+        const isFollow = await this.isFollow(loginUser.userId, video.userId);
+        const isLike = await this.isLike(
+          loginUser.userId,
+          video.userId,
+          video.id,
+        );
+        const users = await this.usersRepository.findOne(video.userId);
+        if (!users)
+          throw new HttpException(
+            {
+              statusCode: 404,
+              message: '사용자 정보 없음',
+              error: 'USER-001',
+              data: { loginData: loginData, start: start, end: end },
+            },
+            404,
+          );
+        const hashTags = await this.tagRepository.find({
+          select: ['tagName'],
+          where: { videoId: video.id },
+        });
+        return Object.assign(video, {
+          hashTags: hashTags.map(({ tagName }) => tagName),
+          relation: { isFollow: isFollow, isLike: isLike },
+          poster: {
+            name: users.userName,
+            picture: users.userPhotoURL,
+            followNum: users.followerCount,
+          },
+        });
+      }),
+    );
+
+    const videosDataWatch = await Promise.all(
+      videosLikeWatch.map(async (video) => {
+        const isFollow = await this.isFollow(loginUser.userId, video.userId);
+        const isLike = await this.isLike(
+          loginUser.userId,
+          video.userId,
+          video.id,
+        );
+        const users = await this.usersRepository.findOne(video.userId);
+        if (!users)
+          throw new HttpException(
+            {
+              statusCode: 404,
+              message: '사용자 정보 없음',
+              error: 'USER-001',
+              data: { loginData: loginData, start: start, end: end },
+            },
+            404,
+          );
+        const hashTags = await this.tagRepository.find({
+          select: ['tagName'],
+          where: { videoId: video.id },
+        });
+        return Object.assign(video, {
+          hashTags: hashTags.map(({ tagName }) => tagName),
+          relation: { isFollow: isFollow, isLike: isLike },
+          poster: {
+            name: users.userName,
+            picture: users.userPhotoURL,
+            followNum: users.followerCount,
+          },
+        });
+      }),
+    );
+    return {
+      lolRecommand: videosDataLOL,
+      pubgRecommand: videosDataPUBG,
+      watchRecommand: videosDataWatch,
+    };
   }
 
   async findSearchAll(start: number, end: number, userId: string) {
