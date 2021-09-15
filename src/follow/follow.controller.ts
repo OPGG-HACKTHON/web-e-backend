@@ -6,6 +6,7 @@ import {
   HttpException,
   Param,
   Post,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -83,9 +84,9 @@ export class FollowController {
   @ApiResponse({ status: 200, description: '새로운 좋아요 목록' })
   @ApiResponse({ status: 404, description: '데이터정보 없음' })
   @Get(':userId/newFollower')
-  async getNewFollower(@Param('userId') userId: string) {
+  async getNewFollower(@Param('userId') userId: string, @Req() req) {
     try {
-      const followers = await this.followService.getNewFollowers(userId);
+      const followers = await this.followService.getNewFollowers(req);
       return {
         statusCode: 200,
         message: '새로운 팔로워 리스트',

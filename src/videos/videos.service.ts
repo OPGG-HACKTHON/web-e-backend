@@ -56,7 +56,8 @@ export class VideosService {
 
   async findAll(start: number, end: number) {
     const videos = await this.videosRepository.find({
-      id: Between(start, end),
+      where: { id: Between(start, end) },
+      order: { likes: 'DESC' },
     });
     const videosData = await Promise.all(
       videos.map(async (video) => {
@@ -94,6 +95,110 @@ export class VideosService {
     const videos = await this.videosRepository.find({
       id: Between(start, end),
     });
+    const videosData = await Promise.all(
+      videos.map(async (video) => {
+        const isFollow = await this.isFollow(loginUser.userId, video.userId);
+        const isLike = await this.isLike(
+          loginUser.userId,
+          video.userId,
+          video.id,
+        );
+        const users = await this.usersRepository.findOne(video.userId);
+        if (!users)
+          throw new HttpException(
+            {
+              statusCode: 404,
+              message: '사용자 정보 없음',
+              error: 'USER-001',
+              data: { loginData: loginData, start: start, end: end },
+            },
+            404,
+          );
+        const hashTags = await this.tagRepository.find({
+          select: ['tagName'],
+          where: { videoId: video.id },
+        });
+        return Object.assign(video, {
+          hashTags: hashTags.map(({ tagName }) => tagName),
+          relation: { isFollow: isFollow, isLike: isLike },
+          poster: {
+            name: users.userName,
+            picture: users.userPhotoURL,
+            followNum: users.followerCount,
+          },
+        });
+      }),
+    );
+    return videosData;
+  }
+
+  async findAllOnUserRecommand(loginData: any, start: number, end: number) {
+    const loginUser = await this.usersRepository.findOne(loginData.id);
+    if (loginUser.userId !== loginData.id)
+      throw new HttpException(
+        {
+          statusCode: 404,
+          message: '사용자 정보 없음',
+          error: 'USER-001',
+          data: { loginData: loginData, start: start, end: end },
+        },
+        404,
+      );
+
+    const videosLikeLOL = await this.videoLikeRepository
+      .createQueryBuilder('vl')
+      .innerJoin(User, 'u', 'vl.userId = u.userId')
+      .select([
+        'u.lolTier AS lolTier',
+        'vl.videoId AS videoId',
+        'count(vl.videoId) AS cnt',
+      ])
+      .groupBy('vl.videoId, u.lolTier')
+      .having('u.lolTier=:lolTier', { lolTier: loginData.lolTier })
+      .orderBy('cnt', 'DESC')
+      .getRawMany();
+
+    const videosLikePUBG = await this.videoLikeRepository
+      .createQueryBuilder('vl')
+      .innerJoin(User, 'u', 'vl.userId = u.userId')
+      .select([
+        'u.pubgTier AS pubgTier',
+        'vl.videoId AS videoId',
+        'count(vl.videoId) AS cnt',
+      ])
+      .groupBy('vl.videoId, u.pubgTier')
+      .having('u.pubgTier=:pubgTier', { pubgTier: loginData.pubgTier })
+      .orderBy('cnt', 'DESC')
+      .getRawMany();
+
+    const videosLikeWatch = await this.videoLikeRepository
+      .createQueryBuilder('vl')
+      .innerJoin(User, 'u', 'vl.userId = u.userId')
+      .select([
+        'u.watchTier AS watchTier',
+        'vl.videoId AS videoId',
+        'count(vl.videoId) AS cnt',
+      ])
+      .groupBy('vl.videoId, u.watchTier')
+      .having('u.watchTier=:watchTier', { watchTier: loginData.watchTier })
+      .orderBy('cnt', 'DESC')
+      .getRawMany();
+
+    const videosLike = videosLikeLOL
+      .map(({ videoId }) => videoId)
+      .reverse()
+      .concat(
+        videosLikePUBG.map(({ videoId }) => videoId).reverse(),
+        videosLikeWatch.map(({ videoId }) => videoId).reverse(),
+      );
+    console.log(videosLike);
+    const videos = await this.videosRepository
+      .createQueryBuilder('v')
+      .orderBy('FIELD(v.id, :...Ids)', 'DESC')
+      .setParameters({
+        Ids: videosLike,
+      })
+      .getRawMany();
     const videosData = await Promise.all(
       videos.map(async (video) => {
         const isFollow = await this.isFollow(loginUser.userId, video.userId);
@@ -369,6 +474,38 @@ export class VideosService {
         try {
           const token = jwtDecode(header);
           return token['userId'];
+        } catch (err) {
+          throw new HttpException(
+            {
+              statusCode: 404,
+              message: '토큰 정보 없음',
+              error: 'TOKEN-001',
+            },
+            404,
+          );
+        }
+      } else {
+        return 'no-data';
+      }
+    } else {
+      return 'no-data';
+    }
+  }
+
+  async findTokenDetails(req: any) {
+    const header = req.headers.authorization;
+    if (header !== undefined) {
+      const validToken = header.split(' ');
+      if (validToken[1] !== 'undefined') {
+        try {
+          const token = jwtDecode(header);
+          return {
+            id: token['userId'],
+            feed: token['userFeed'],
+            lolTier: token['lolTier'],
+            pubgTier: token['pubgTier'],
+            watchTier: token['watchTier'],
+          };
         } catch (err) {
           throw new HttpException(
             {
