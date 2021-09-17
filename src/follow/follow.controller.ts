@@ -6,6 +6,7 @@ import {
   HttpException,
   Param,
   Post,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -50,13 +51,7 @@ export class FollowController {
       const follow = await this.followService.createFollow(followData);
       return follow;
     } catch (err) {
-      throw new HttpException(
-        {
-          statusCode: err.status,
-          message: err.message,
-        },
-        err.status,
-      );
+      throw new HttpException(err.response, err.status);
     }
   }
 
@@ -78,13 +73,7 @@ export class FollowController {
         followersCount: followers.length,
       };
     } catch (err) {
-      throw new HttpException(
-        {
-          statusCode: err.status,
-          message: err.message,
-        },
-        err.status,
-      );
+      throw new HttpException(err.response, err.status);
     }
   }
 
@@ -95,9 +84,9 @@ export class FollowController {
   @ApiResponse({ status: 200, description: '새로운 좋아요 목록' })
   @ApiResponse({ status: 404, description: '데이터정보 없음' })
   @Get(':userId/newFollower')
-  async getNewFollower(@Param('userId') userId: string) {
+  async getNewFollower(@Param('userId') userId: string, @Req() req) {
     try {
-      const followers = await this.followService.getNewFollowers(userId);
+      const followers = await this.followService.getNewFollowers(req);
       return {
         statusCode: 200,
         message: '새로운 팔로워 리스트',
@@ -105,13 +94,7 @@ export class FollowController {
         followersCount: followers.length,
       };
     } catch (err) {
-      throw new HttpException(
-        {
-          statusCode: err.status,
-          message: err.message,
-        },
-        err.status,
-      );
+      throw new HttpException(err.response, err.status);
     }
   }
 
@@ -133,13 +116,7 @@ export class FollowController {
         followingsCount: following.length,
       };
     } catch (err) {
-      throw new HttpException(
-        {
-          statusCode: err.status,
-          message: err.message,
-        },
-        err.status,
-      );
+      throw new HttpException(err.response, err.status);
     }
   }
 
@@ -158,13 +135,7 @@ export class FollowController {
       await this.followService.unfollow(followData);
       return { statusCode: 200, message: '언팔로우', data: followData };
     } catch (err) {
-      throw new HttpException(
-        {
-          statusCode: err.status,
-          message: err.message,
-        },
-        err.status,
-      );
+      throw new HttpException(err.response, err.status);
     }
   }
 }

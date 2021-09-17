@@ -3,6 +3,7 @@ import { IsBoolean, IsEnum, IsNumber, IsString } from 'class-validator';
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 import { Video } from 'src/videos/entities/video.entity';
 import { Follow } from 'src/follow/entities/follow.entity';
+import { Comment } from 'src/comment/entities/comment.entity';
 import { timestamp } from 'rxjs';
 import { VideoLike } from 'src/video-like/entities/video-like.entity';
 //사용자 권한
@@ -186,4 +187,8 @@ export class User {
   @ApiProperty({ type: VideoLike, description: '비디오 좋아요 당하는 사용자' })
   @OneToMany(() => VideoLike, (videoLike) => videoLike.likedUser)
   likedUser: VideoLike[];
+
+  @ApiProperty({ type: Comment, description: '댓글의 사용자' })
+  @OneToMany(() => Comment, (comment) => comment.user)
+  commentUser: Comment[];
 }

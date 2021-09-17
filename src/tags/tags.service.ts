@@ -26,7 +26,16 @@ export class TagsService {
     const video = await this.videosRepository.findOne({
       id: videoId,
     });
-    if (!video) throw new HttpException('비디오 정보가 없습니다', 404);
+    if (!video)
+      throw new HttpException(
+        {
+          statusCode: 404,
+          message: '비디오 정보 없음',
+          error: 'VIDEO-001',
+          data: { videoId: videoId, tag: tag },
+        },
+        404,
+      );
     return await this.tagRepository.save({
       videoId: videoId,
       tagName: tag,
@@ -35,7 +44,11 @@ export class TagsService {
   //select videoId from tag where tagName regexp 'string|string2|string3...';
   async getTags(tagData: string[], userId: string) {
     if (tagData.length === 0) {
-      throw new HttpException('검색 데이터가 없습니다', 202);
+      return {
+        statusCode: 202,
+        message: '검색 데이터가 없습니다',
+        datas: tagData,
+      };
     }
     if (isArray(tagData)) {
       const data = tagData.join('|');
@@ -79,7 +92,16 @@ export class TagsService {
         const isFollow = await this.isFollow(userId, video.userId);
         const isLike = await this.isLike(userId, video.userId, video.id);
         const users = await this.usersRepository.findOne(video.userId);
-        if (!users) throw new HttpException('사용자 정보가 없습니다', 404);
+        if (!users)
+          throw new HttpException(
+            {
+              statusCode: 404,
+              message: '입력 유저네임(닉네임) 없음',
+              error: 'USER-001',
+              data: video.userId,
+            },
+            404,
+          );
         const hashTags = await this.tagRepository.find({
           select: ['tagName'],
           where: { videoId: video.id },

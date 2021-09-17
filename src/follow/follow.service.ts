@@ -17,14 +17,48 @@ export class FollowService {
   async createFollow(followData: CreateFollowDto) {
     const user = await this.userRepository.findOne(followData.userId);
     const following = await this.userRepository.findOne(followData.followingId);
-    if (!user) throw new HttpException('사용자가 없습니다', 404);
-    if (!following) throw new HttpException('팔로우할 사용자가 없습니다', 404);
+    if (!user)
+      throw new HttpException(
+        {
+          statusCode: 404,
+          message: '팔로우 요청하는 사용자 정보 없음',
+          error: 'FOLLOW-002',
+          data: followData,
+        },
+        404,
+      );
+    if (!following)
+      throw new HttpException(
+        {
+          statusCode: 404,
+          message: '팔로우 할 사용자 정보 없음',
+          error: 'FOLLOW-003',
+          data: followData,
+        },
+        404,
+      );
     if (user.userId === following.userId)
-      throw new HttpException('나자신을 팔로우 할 수 없습니다', 405);
+      throw new HttpException(
+        {
+          statusCode: 409,
+          message: '나 자신을 팔로우 할 수 없음',
+          error: 'FOLLOW-004',
+          data: followData,
+        },
+        409,
+      );
 
     const already = await this.alreadyFollow(followData);
     if (already) {
-      throw new HttpException('이미 팔로우한 사용자입니다', 406);
+      throw new HttpException(
+        {
+          statusCode: 409,
+          message: '이미 팔로우 한 사용자',
+          error: 'FOLLOW-005',
+          data: followData,
+        },
+        409,
+      );
     } else {
       await this.followRepository.save({
         userId: user.userId,
@@ -53,7 +87,16 @@ export class FollowService {
   async getMyFollowers(userId: string) {
     //userId validation
     const validUser = await this.userRepository.findOne({ userId: userId });
-    if (!validUser) throw new HttpException('사용자가 없습니다', 404);
+    if (!validUser)
+      throw new HttpException(
+        {
+          statusCode: 404,
+          message: '사용자 정보 없음',
+          error: 'USER-001',
+          data: userId,
+        },
+        404,
+      );
     //follower logic
     const followers = await this.followRepository
       .createQueryBuilder('f')
@@ -72,7 +115,16 @@ export class FollowService {
   async getMyFollowings(userId: string) {
     //userId validation
     const validUser = await this.userRepository.findOne({ userId: userId });
-    if (!validUser) throw new HttpException('사용자가 없습니다', 404);
+    if (!validUser)
+      throw new HttpException(
+        {
+          statusCode: 404,
+          message: '사용자 정보 없음',
+          error: 'USER-001',
+          data: userId,
+        },
+        404,
+      );
     //follwingLogic
     const following = await this.followRepository
       .createQueryBuilder('f')
@@ -96,7 +148,16 @@ export class FollowService {
       userId: followData.userId,
       followingId: followData.followingId,
     });
-    if (!validFollow) throw new HttpException('팔로우 중이 아닙니다', 404);
+    if (!validFollow)
+      throw new HttpException(
+        {
+          statusCode: 409,
+          message: '이미 팔로우 한 사용자',
+          error: 'FOLLOW-001',
+          data: followData,
+        },
+        409,
+      );
     else {
       await this.followRepository.delete({
         userId: validFollow.userId,
@@ -111,7 +172,16 @@ export class FollowService {
   async getNewFollowers(userId: string) {
     //userId validation
     const validUser = await this.userRepository.findOne({ userId: userId });
-    if (!validUser) throw new HttpException('사용자가 없습니다', 404);
+    if (!validUser)
+      throw new HttpException(
+        {
+          statusCode: 404,
+          message: '사용자 정보 없음',
+          error: 'USER-001',
+          data: userId,
+        },
+        404,
+      );
     else {
       //follwing Alarm Logic
       return await this.followRepository

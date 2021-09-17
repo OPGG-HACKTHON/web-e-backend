@@ -35,9 +35,7 @@ export class VideoLikeController {
   @ApiResponse({ status: 201, description: '비디오 좋아요 성공' })
   @ApiResponse({ status: 400, description: '입력데이터 오류' })
   @ApiResponse({ status: 401, description: '권한 오류' })
-  @ApiResponse({ status: 404, description: '사용자 없음' })
-  @ApiResponse({ status: 405, description: '자신의 비디오 좋아요' })
-  @ApiResponse({ status: 406, description: '이미 좋아요 한 비디오' })
+  @ApiResponse({ status: 404, description: '데이터 정보 없음' })
   @ApiBody({
     type: CreateVideoLikeDto,
     description: '사용자ID(userId), Like할 Video Id(videoId)',
@@ -51,13 +49,7 @@ export class VideoLikeController {
       const like = this.videoLikeService.create(likeData, req.user);
       return like;
     } catch (err) {
-      throw new HttpException(
-        {
-          statusCode: err.status,
-          message: err.message,
-        },
-        err.status,
-      );
+      throw new HttpException(err.response, err.status);
     }
   }
 
@@ -66,7 +58,8 @@ export class VideoLikeController {
     summary: '좋아요 리스트',
   })
   @ApiResponse({ status: 200, description: '좋아요 목록' })
-  @ApiResponse({ status: 404, description: '데이터정보 없음' })
+  @ApiResponse({ status: 400, description: '입력 데이터 없음' })
+  @ApiResponse({ status: 404, description: '데이터 정보 없음' })
   @Get(':userId/list')
   async getList(@Param('userId') userId: string) {
     try {
@@ -78,13 +71,7 @@ export class VideoLikeController {
         listCount: list.length,
       };
     } catch (err) {
-      throw new HttpException(
-        {
-          statusCode: err.status,
-          message: err.message,
-        },
-        err.status,
-      );
+      throw new HttpException(err.response, err.status);
     }
   }
 
@@ -93,7 +80,8 @@ export class VideoLikeController {
     summary: '새로운 좋아요 리스트',
   })
   @ApiResponse({ status: 200, description: '새로운 좋아요 목록' })
-  @ApiResponse({ status: 404, description: '데이터정보 없음' })
+  @ApiResponse({ status: 400, description: '입력 데이터 없음' })
+  @ApiResponse({ status: 404, description: '데이터 정보 없음' })
   @Get(':userId/newList')
   async getNewList(@Param('userId') userId: string) {
     try {
@@ -105,13 +93,7 @@ export class VideoLikeController {
         listCount: list.length,
       };
     } catch (err) {
-      throw new HttpException(
-        {
-          statusCode: err.status,
-          message: err.message,
-        },
-        err.status,
-      );
+      throw new HttpException(err.response, err.status);
     }
   }
 
@@ -123,6 +105,7 @@ export class VideoLikeController {
     summary: '좋아요 취소',
   })
   @ApiResponse({ status: 200, description: '좋아요 취소' })
+  @ApiResponse({ status: 400, description: '입력 데이터 없음' })
   @ApiResponse({ status: 404, description: '좋아요 데이터 정보 없음' })
   @Delete()
   async dislike(@Req() req, @Body() likeData: CreateVideoLikeDto) {
@@ -130,13 +113,7 @@ export class VideoLikeController {
       const dislike = await this.videoLikeService.dislike(req.user, likeData);
       return dislike;
     } catch (err) {
-      throw new HttpException(
-        {
-          statusCode: err.status,
-          message: err.message,
-        },
-        err.status,
-      );
+      throw new HttpException(err.response, err.status);
     }
   }
 }

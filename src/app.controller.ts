@@ -1,4 +1,11 @@
-import { Controller, Get, Request, Post, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Request,
+  Post,
+  UseGuards,
+  HttpException,
+} from '@nestjs/common';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { LocalAuthGuard } from './auth/local-auth.guard';
 import { AuthService } from './auth/auth.service';
@@ -19,20 +26,22 @@ export class AppController {
   @UseGuards(LocalAuthGuard)
   @ApiOperation({
     summary: '사용자 로그인',
-    description:
-      '로그인을 진행한다. Follower 목록과(followers), 새로추가된 Follwer 목록을 보여준다(newFollowers)',
+    description: '로그인을 진행한다',
   })
   @ApiOkResponse({
     description: '유저 로그인',
   })
   @ApiUnauthorizedResponse({ description: '유효기간 만료' })
   @ApiResponse({ status: 400, description: '유저 ID 오류' })
-  @ApiResponse({ status: 401, description: '비밀번호 오류' })
   @Post('auth/login')
   @ApiBody({ type: LoginUserDto }) //id와 비밀번호를 받는 형식
   //Body로 전달해야 DTO데이터가 넘어간다!
   async login(@Request() req) {
-    return this.authService.login(req.user);
+    try {
+      return this.authService.login(req.user);
+    } catch (err) {
+      throw new HttpException(err, err.status);
+    }
   }
 
   @ApiBearerAuth('access-token') //Bearer 토큰이 필요, 이름으로 대체

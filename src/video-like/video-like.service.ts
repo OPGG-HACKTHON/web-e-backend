@@ -35,17 +35,66 @@ export class VideoLikeService {
     });
     //input validation
     if (!user)
-      throw new HttpException('좋아요 하는 유저 아이디 정보가 없습니다', 404);
+      throw new HttpException(
+        {
+          statusCode: 404,
+          message: '좋아요 하는 아이디 정보 없음',
+          error: 'USER-001',
+          data: likeData,
+        },
+        404,
+      );
     if (!likeUser)
-      throw new HttpException('좋아요 받는 유저 아이디 정보가 없습니다', 404);
+      throw new HttpException(
+        {
+          statusCode: 404,
+          message: '좋아요 받는 아이디 정보 없음',
+          error: 'USER-001',
+          data: likeData,
+        },
+        404,
+      );
     if (!likeVideo)
-      throw new HttpException('좋아요 받는 비디오 정보가 없습니다', 404);
-    if (already) throw new HttpException('이미 좋아요 상태입니다.', 406);
+      throw new HttpException(
+        {
+          statusCode: 404,
+          message: '좋아요 받는 비디오 정보 없음',
+          error: 'VIDEO-001',
+          data: likeData,
+        },
+        404,
+      );
+    if (already)
+      throw new HttpException(
+        {
+          statusCode: 409,
+          message: '이미 좋아요 상태',
+          error: 'LIKE-003',
+          data: likeData,
+        },
+        409,
+      );
     //login data and user validation
     if (user.userId === likeUser.userId)
-      throw new HttpException('내 동영상을 좋아요 할 수 없습니다.', 405);
+      throw new HttpException(
+        {
+          statusCode: 409,
+          message: '내 동영상 좋아요 불가능',
+          error: 'LIKE-002',
+          data: likeData,
+        },
+        409,
+      );
     if (likeData.userId !== loginUser.id)
-      throw new HttpException('권한이 없습니다(로그인 정보 불일치)', 405);
+      throw new HttpException(
+        {
+          statusCode: 409,
+          message: '로그인 정보 불일치',
+          error: 'USER-005',
+          data: likeData,
+        },
+        409,
+      );
     await this.videoLikeRepository.save(likeData);
     likeVideo.likes += 1;
     await this.videosRepository.save(likeVideo);
@@ -66,11 +115,45 @@ export class VideoLikeService {
       user: likeUser,
     });
     if (!likeUser)
-      throw new HttpException('좋아요 받는 유저 아이디 정보가 없습니다', 404);
-    if (!video) throw new HttpException('좋아요한 비디오 정보가 없습니다', 404);
-    if (!like) throw new HttpException('좋아요 정보가 없습니다', 404);
+      throw new HttpException(
+        {
+          statusCode: 404,
+          message: '좋아요 받는 아이디 정보 없음',
+          error: 'USER-001',
+          data: { loginData: loginUser, likeData: likeData },
+        },
+        404,
+      );
+    if (!video)
+      throw new HttpException(
+        {
+          statusCode: 404,
+          message: '좋아요 한 비디오 정보 없음',
+          error: 'VIDEO-001',
+          data: { loginData: loginUser, likeData: likeData },
+        },
+        404,
+      );
+    if (!like)
+      throw new HttpException(
+        {
+          statusCode: 404,
+          message: '좋아요 정보 없음',
+          error: 'LIKE-001',
+          data: { loginData: loginUser, likeData: likeData },
+        },
+        404,
+      );
     if (loginUser.id !== likeData.userId)
-      throw new HttpException('권한이 없습니다(로그인 정보 불일치)', 401);
+      throw new HttpException(
+        {
+          statusCode: 404,
+          message: '로그인 정보 불일치',
+          error: 'USER-005',
+          data: { loginData: loginUser, likeData: likeData },
+        },
+        404,
+      );
     else {
       await this.videoLikeRepository.delete({
         userId: likeData.userId,
@@ -96,7 +179,16 @@ export class VideoLikeService {
   //get like list
   async getList(userId: string) {
     const validUser = await this.usersRepository.findOne({ userId: userId });
-    if (!validUser) throw new HttpException('사용자가 없습니다', 404);
+    if (!validUser)
+      throw new HttpException(
+        {
+          statusCode: 404,
+          message: '사용자 정보 없음',
+          error: 'USER-001',
+          data: userId,
+        },
+        404,
+      );
     //like list Logic
     const likeList = await this.videoLikeRepository
       .createQueryBuilder('vl')
@@ -119,7 +211,16 @@ export class VideoLikeService {
   //get new video Like list
   async getNewList(userId: string) {
     const validUser = await this.usersRepository.findOne({ userId: userId });
-    if (!validUser) throw new HttpException('사용자가 없습니다', 404);
+    if (!validUser)
+      throw new HttpException(
+        {
+          statusCode: 404,
+          message: '사용자 정보 없음',
+          error: 'USER-001',
+          data: userId,
+        },
+        404,
+      );
     //new like list Logic
     const likeList = await this.videoLikeRepository
       .createQueryBuilder('vl')

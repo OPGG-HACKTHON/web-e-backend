@@ -43,10 +43,9 @@ export class UsersController {
     description: '회원가입을 진행한다.',
   })
   @ApiCreatedResponse({ description: '회원가입 완료' })
-  @ApiResponse({ status: 400, description: '입력값 오류' })
-  @ApiResponse({ status: 403, description: '아이디 중복 오류' })
-  @ApiResponse({ status: 405, description: '이름(userName) 중복 오류' })
-  @ApiResponse({ status: 406, description: '비밀번호 불일치' })
+  @ApiResponse({ status: 404, description: '입력정보 없음' })
+  @ApiResponse({ status: 400, description: '입력 값 오류' })
+  @ApiResponse({ status: 409, description: '아이디, 닉네임 중복 오류' })
   @ApiBody({ type: CreateUserDto })
   async register(@Body() userData: CreateUserDto) {
     try {
@@ -54,13 +53,7 @@ export class UsersController {
       return { statusCode: 201, message: '회원가입 완료', data: userData };
       //async await을 붙여줘야 service에서 내뿜은 에러를 받을 수 있다.
     } catch (err) {
-      throw new HttpException(
-        {
-          statusCode: err.status,
-          message: err.message,
-        },
-        err.status,
-      );
+      throw new HttpException(err.response, err.status);
     }
   }
 
@@ -82,7 +75,15 @@ export class UsersController {
   async searchUser(@Query() query, @Req() req) {
     try {
       if (query.user === undefined) {
-        throw new HttpException('검색할 사용자를 입력해 주세요', 404);
+        throw new HttpException(
+          {
+            statusCode: 400,
+            message: '입력 아이디 없음',
+            error: 'INPUT-001',
+            data: query.user,
+          },
+          400,
+        );
       }
       const tokenId = await this.userService.findTokenId(req);
       if (tokenId === 'no-data') {
@@ -104,13 +105,7 @@ export class UsersController {
         };
       }
     } catch (err) {
-      throw new HttpException(
-        {
-          statusCode: err.status,
-          message: err.message,
-        },
-        err.status,
-      );
+      throw new HttpException(err.response, err.status);
     }
   }
 
@@ -128,13 +123,7 @@ export class UsersController {
       const { userPassword, ...data } = datas;
       return { statusCode: 200, message: '데이터 반환 성공', data: data };
     } catch (err) {
-      throw new HttpException(
-        {
-          statusCode: err.status,
-          message: err.message,
-        },
-        err.status,
-      );
+      throw new HttpException(err.response, err.status);
     }
   }
   @ApiBearerAuth('access-token') //Bearer 토큰이 필요, 이름으로 대체
@@ -154,14 +143,7 @@ export class UsersController {
       await this.userService.deleteUser(deleteData);
       return { statusCode: 200, message: '삭제 완료', data: deleteData };
     } catch (err) {
-      throw new HttpException(
-        {
-          statusCode: err.status,
-          message: err.message,
-          data: deleteData,
-        },
-        err.status,
-      );
+      throw new HttpException(err.response, err.status);
     }
   }
 
@@ -172,6 +154,7 @@ export class UsersController {
   })
   @ApiUnauthorizedResponse({ description: '사용자 권한오류' })
   @ApiResponse({ status: 404, description: '해당 사용자 없음' })
+  @ApiResponse({ status: 409, description: '닉네임 중복' })
   @ApiBadRequestResponse({ description: '입력값 오류' })
   @ApiOkResponse({ description: '적용완료' })
   @Patch(':userId')
@@ -185,14 +168,7 @@ export class UsersController {
       await this.userService.updateUser(userId, updateData);
       return { statusCode: 200, message: '적용완료', data: updateData };
     } catch (err) {
-      throw new HttpException(
-        {
-          statusCode: err.status,
-          message: err.message,
-          data: updateData,
-        },
-        err.status,
-      );
+      throw new HttpException(err.response, err.status);
     }
   }
 }

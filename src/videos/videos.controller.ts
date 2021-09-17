@@ -97,14 +97,7 @@ export class VideosController {
           };
         })
         .catch((err) => {
-          throw new HttpException(
-            {
-              statusCode: err.status,
-              message: err.message,
-              data: createVideoDto,
-            },
-            err.status,
-          );
+          throw new HttpException(err.response, err.status);
         });
       return {
         statusCode: 201,
@@ -113,13 +106,7 @@ export class VideosController {
         hashTags: tags.datas,
       };
     } catch (err) {
-      throw new HttpException(
-        {
-          statusCode: err.status,
-          message: err.message,
-        },
-        err.status,
-      );
+      throw new HttpException(err.response, err.status);
     }
   }
 
@@ -153,13 +140,7 @@ export class VideosController {
         datas: videoList,
       };
     } catch (err) {
-      throw new HttpException(
-        {
-          statusCode: err.status,
-          message: err.message,
-        },
-        err.status,
-      );
+      throw new HttpException(err.response, err.status);
     }
   }
 
@@ -188,13 +169,7 @@ export class VideosController {
         datas: videoList,
       };
     } catch (err) {
-      throw new HttpException(
-        {
-          statusCode: err.status,
-          message: err.message,
-        },
-        err.status,
-      );
+      throw new HttpException(err.response, err.status);
     }
   }
 
@@ -212,13 +187,7 @@ export class VideosController {
         datas: videoList,
       };
     } catch (err) {
-      throw new HttpException(
-        {
-          statusCode: err.status,
-          message: err.message,
-        },
-        err.status,
-      );
+      throw new HttpException(err.response, err.status);
     }
   }
 
@@ -232,13 +201,7 @@ export class VideosController {
       const videoList = await this.videosService.findAll(1, 200);
       return videoList;
     } catch (err) {
-      throw new HttpException(
-        {
-          statusCode: err.status,
-          message: err.message,
-        },
-        err.status,
-      );
+      throw new HttpException(err.response, err.status);
     }
   }
 
@@ -312,13 +275,81 @@ export class VideosController {
         }
       }
     } catch (err) {
-      throw new HttpException(
-        {
-          statusCode: err.status,
-          message: err.message,
-        },
-        err.status,
-      );
+      throw new HttpException(err.response, err.status);
+    }
+  }
+
+  @Get('/recommandList')
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: '동영상 리스트' })
+  @ApiOkResponse({ description: '리스트' })
+  @ApiUnauthorizedResponse({ description: '권한이 없음' })
+  @ApiBadRequestResponse({ description: '잘못된 입력' })
+  @ApiQuery({
+    name: 'end',
+    description: '끝번호',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'start',
+    description: '시작번호',
+    required: false,
+  })
+  async findAllListRecommand(@Req() req, @Query() query) {
+    try {
+      const tokenId = await this.videosService.findTokenDetails(req);
+      if (tokenId === 'no-data') {
+        if (
+          Object.keys(query).includes('start') &&
+          Object.keys(query).includes('end')
+        ) {
+          const videoList = await this.videosService.findAll(
+            query.start,
+            query.end,
+          );
+          return {
+            statusCode: 200,
+            message: '비디오 리스트',
+            datas: videoList,
+          };
+        } else {
+          const videoList = await this.videosService.findAll(1, 200);
+          return {
+            statusCode: 200,
+            message: '비디오 리스트',
+            datas: videoList,
+          };
+        }
+      } else {
+        if (
+          Object.keys(query).includes('start') &&
+          Object.keys(query).includes('end')
+        ) {
+          const videoList = await this.videosService.findAllOnUserRecommand(
+            tokenId,
+            query.start,
+            query.end,
+          );
+          return {
+            statusCode: 200,
+            message: '비디오 리스트',
+            datas: videoList,
+          };
+        } else {
+          const videoList = await this.videosService.findAllOnUserRecommand(
+            tokenId,
+            1,
+            200,
+          );
+          return {
+            statusCode: 200,
+            message: '비디오 리스트',
+            datas: videoList,
+          };
+        }
+      }
+    } catch (err) {
+      throw new HttpException(err.response, err.status);
     }
   }
 
@@ -416,13 +447,7 @@ export class VideosController {
         }
       }
     } catch (err) {
-      throw new HttpException(
-        {
-          statusCode: err.status,
-          message: err.message,
-        },
-        err.status,
-      );
+      throw new HttpException(err.response, err.status);
     }
   }
 
